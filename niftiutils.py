@@ -7,7 +7,7 @@ def conv8bit(in_path, out_path=None):
     import os.path
     import logging
 
-    logger = logging.getLogger("niftilog")
+    logger = logging.getLogger(__name__)
     nifti = nib.load(in_path)
     data = nifti.get_fdata()
     logger.info('input image loaded')
@@ -41,13 +41,11 @@ def convertImage(in_path, out_path, reverse=False, bs=100, x_final=0.025, y_fina
     import os, logging
     import skimage.external.tifffile as tiff
     from skimage.transform import rescale
-    #from scipy.ndimage import zoom
 
-    logger = logging.getLogger("niftilog")
+    logger = logging.getLogger(__name__)
     in_image = tiff.imread(in_path)
     logger.info('input image loaded')
 
-    #downsize = (int(in_image.shape[2]/x_scale), int(in_image.shape[1]/y_scale), int(in_image.shape[0]/z_scale))
     temp = rescale(np.swapaxes(in_image, 0, 2), scale=((x_pix/x_final), (y_pix/y_final), (z_pix/z_final)),
                    multichannel=False, anti_aliasing=False, preserve_range=True)
     logger.info('image downscaled')
@@ -91,7 +89,7 @@ def merge(f_path, b_path, out_path, ms, t):
     import numpy as np
     import logging
 
-    logger = logging.getLogger("niftilog")
+    logger = logging.getLogger(__name__)
 
     front = nib.load(f_path)
     f_data = front.get_fdata()

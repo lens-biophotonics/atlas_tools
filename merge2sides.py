@@ -9,7 +9,7 @@ def main():
     import os.path
 
     logging.basicConfig(format='[%(funcName)s] - %(asctime)s - %(message)s', level=logging.INFO)
-    logger = logging.getLogger("niftilog")
+    logger = logging.getLogger(__name__)
     coloredlogs.install(level='DEBUG', logger=logger)
 
     parser = argparse.ArgumentParser()

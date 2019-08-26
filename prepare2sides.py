@@ -13,7 +13,6 @@ def main():
     import skimage.external.tifffile as tiff
 
     logger = logging.getLogger(__name__)
-    logger.addHandler(logging.NullHandler())
     logging.basicConfig(format='[%(funcName)s] - %(asctime)s - %(message)s', level=logging.INFO)
     coloredlogs.install(level='DEBUG', logger=logger)
 
