@@ -34,19 +34,22 @@ def conv8bit(in_path, out_path=None):
     return out_path
 
 
-def convertImage(in_path, out_path, reverse=False, bs=100, x_scale=2, y_scale=2, z_scale=2, x_pix=0.0104, y_pix=0.0104,
-                 z_pix=0.01, nl=110, gamma=0.3, mp=99.9):
+def convertImage(in_path, out_path, reverse=False, bs=100, x_final=0.025, y_final=0.025, z_final=0.025, x_pix=0.0104,
+                 y_pix=0.0104, z_pix=0.01, nl=110, gamma=0.3, mp=99.9):
     import numpy as np
     import nibabel as nib
     import os, logging
     import skimage.external.tifffile as tiff
-    from skimage.transform import downscale_local_mean
+    from skimage.transform import rescale
+    #from scipy.ndimage import zoom
 
     logger = logging.getLogger("niftilog")
     in_image = tiff.imread(in_path)
     logger.info('input image loaded')
 
-    temp = downscale_local_mean(np.swapaxes(in_image, 0, 2), (x_scale, y_scale, z_scale))
+    #downsize = (int(in_image.shape[2]/x_scale), int(in_image.shape[1]/y_scale), int(in_image.shape[0]/z_scale))
+    temp = rescale(np.swapaxes(in_image, 0, 2), scale=((x_pix/x_final), (y_pix/y_final), (z_pix/z_final)),
+                   multichannel=False, anti_aliasing=False, preserve_range=True)
     logger.info('image downscaled')
 
     temp = temp - nl
@@ -64,9 +67,9 @@ def convertImage(in_path, out_path, reverse=False, bs=100, x_scale=2, y_scale=2,
     logger.info('image processed')
 
     nifti = nib.Nifti1Image(out_image, None)
-    nifti.header['pixdim'][1] = x_pix*x_scale
-    nifti.header['pixdim'][2] = y_pix*y_scale
-    nifti.header['pixdim'][3] = z_pix*z_scale
+    nifti.header['pixdim'][1] = x_final
+    nifti.header['pixdim'][2] = y_final
+    nifti.header['pixdim'][3] = z_final
     # 2 is the NIFTI code for unsigned char, see https://nifti.nimh.nih.gov/nifti-1/documentation/nifti1fields/
     nifti.header['datatype'] = 2
     nifti.header['bitpix'] = 8

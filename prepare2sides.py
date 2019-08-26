@@ -1,26 +1,29 @@
 #!/usr/bin/python3
 
-from niftiutils import convertImage
-import logging
-import os, argparse
-import skimage.external.tifffile as tiff
-
 b2f_dist = 2.68
 excess_border = 10
 
-logger = logging.getLogger(__name__)
-logger.addHandler(logging.NullHandler())
-logging.basicConfig(format='[%(funcName)s] - %(asctime)s - %(message)s', level=logging.INFO)
-
 
 def main():
+    from niftiutils import convertImage
+    import logging
+    import coloredlogs
+    import os
+    import argparse
+    import skimage.external.tifffile as tiff
+
+    logger = logging.getLogger(__name__)
+    logger.addHandler(logging.NullHandler())
+    logging.basicConfig(format='[%(funcName)s] - %(asctime)s - %(message)s', level=logging.INFO)
+    coloredlogs.install(level='DEBUG', logger=logger)
+
     parser = argparse.ArgumentParser()
     parser.add_argument('-f', '--front', help='front side path', metavar='PATH')
     parser.add_argument('-b', '--back', help='back side path', metavar='PATH')
     parser.add_argument('-o', '--output', help="output base path", metavar='PATH')
-    parser.add_argument('-x-scale', type=float, default=2, help="downscaling factor along x")
-    parser.add_argument('-y-scale', type=float, default=2, help="downscaling factor along y")
-    parser.add_argument('-z-scale', type=float, default=2, help="downscaling factor along z")
+    parser.add_argument('-x-final', type=float, default=0.025, help="final voxel size along x (in mm)")
+    parser.add_argument('-y-final', type=float, default=0.025, help="final voxel size along y (in mm)")
+    parser.add_argument('-z-final', type=float, default=0.025, help="final voxel size along z (in mm)")
     parser.add_argument('-x-pix', type=float, default=0.0104, help="initial voxel size along x (in mm)")
     parser.add_argument('-y-pix', type=float, default=0.0104, help="initial voxel size along y (in mm)")
     parser.add_argument('-z-pix', type=float, default=0.01, help="initial voxel size along z (in mm)")
@@ -35,7 +38,7 @@ def main():
     back = tiff.TiffFile(args.back)
 
     logger.info('processing front image...')
-    black = int((len(back.pages) - b2f_dist/args.z_pix + excess_border)/args.z_scale)
+    black = int((len(back.pages) - b2f_dist/args.z_pix + excess_border)*(args.z_pix/args.z_final))
     base, front_file = os.path.split(args.front)
     name, ext = os.path.splitext(front_file)
 
@@ -45,11 +48,11 @@ def main():
 
     fc_path = os.path.join(args.output, name + ".nii.gz")
     fc_path_nogamma = os.path.join(args.output, name + "_nogamma.nii.gz")
-    convertImage(args.front, out_path=fc_path, reverse=True, bs=black, x_scale=args.x_scale, y_scale=args.y_scale,
-                 z_scale=args.z_scale, x_pix=args.x_pix, y_pix=args.y_pix, z_pix=args.z_pix, nl=args.noise_level,
+    convertImage(args.front, out_path=fc_path, reverse=True, bs=black, x_final=args.x_final, y_final=args.y_final,
+                 z_final=args.z_final, x_pix=args.x_pix, y_pix=args.y_pix, z_pix=args.z_pix, nl=args.noise_level,
                  gamma=args.gamma, mp=args.max_percentile)
-    convertImage(args.front, out_path=fc_path_nogamma, reverse=True, bs=black, x_scale=args.x_scale,
-                 y_scale=args.y_scale, z_scale=args.z_scale, x_pix=args.x_pix, y_pix=args.y_pix, z_pix=args.z_pix,
+    convertImage(args.front, out_path=fc_path_nogamma, reverse=True, bs=black, x_final=args.x_final,
+                 y_final=args.y_final, z_final=args.z_final, x_pix=args.x_pix, y_pix=args.y_pix, z_pix=args.z_pix,
                  nl=args.noise_level, gamma=1, mp=args.max_percentile)
 
     logger.info('processing back image...')
@@ -57,10 +60,10 @@ def main():
     name, ext = os.path.splitext(back_file)
     bc_path = os.path.join(args.output, name + ".nii.gz")
     bc_path_nogamma = os.path.join(args.output, name + "_nogamma.nii.gz")
-    convertImage(args.back, out_path=bc_path, x_scale=args.x_scale, y_scale=args.y_scale, z_scale=args.z_scale,
+    convertImage(args.back, out_path=bc_path, x_final=args.x_final, y_final=args.y_final, z_final=args.z_final,
                  x_pix=args.x_pix, y_pix=args.y_pix, z_pix=args.z_pix, nl=args.noise_level, gamma=args.gamma,
                  mp=args.max_percentile)
-    convertImage(args.back, out_path=bc_path_nogamma, x_scale=args.x_scale, y_scale=args.y_scale, z_scale=args.z_scale,
+    convertImage(args.back, out_path=bc_path_nogamma, x_final=args.x_final, y_final=args.y_final, z_final=args.z_final,
                  x_pix=args.x_pix, y_pix=args.y_pix, z_pix=args.z_pix, nl=args.noise_level, gamma=1,
                  mp=args.max_percentile)
 
