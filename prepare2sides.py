@@ -47,10 +47,10 @@ def main():
 
     fc_path = os.path.join(args.output, name + ".nii.gz")
     fc_path_nogamma = os.path.join(args.output, name + "_nogamma.nii.gz")
-    convertImage(args.front, out_path=fc_path, reverse=True, bs=black, x_final=args.x_final, y_final=args.y_final,
+    topg = convertImage(args.front, out_path=fc_path, reverse=True, bs=black, x_final=args.x_final, y_final=args.y_final,
                  z_final=args.z_final, x_pix=args.x_pix, y_pix=args.y_pix, z_pix=args.z_pix, nl=args.noise_level,
                  gamma=args.gamma, mp=args.max_percentile)
-    convertImage(args.front, out_path=fc_path_nogamma, reverse=True, bs=black, x_final=args.x_final,
+    topng = convertImage(args.front, out_path=fc_path_nogamma, reverse=True, bs=black, x_final=args.x_final,
                  y_final=args.y_final, z_final=args.z_final, x_pix=args.x_pix, y_pix=args.y_pix, z_pix=args.z_pix,
                  nl=args.noise_level, gamma=1, mp=args.max_percentile)
 
@@ -61,10 +61,10 @@ def main():
     bc_path_nogamma = os.path.join(args.output, name + "_nogamma.nii.gz")
     convertImage(args.back, out_path=bc_path, x_final=args.x_final, y_final=args.y_final, z_final=args.z_final,
                  x_pix=args.x_pix, y_pix=args.y_pix, z_pix=args.z_pix, nl=args.noise_level, gamma=args.gamma,
-                 mp=args.max_percentile)
+                 mp=args.max_percentile, top=topg)
     convertImage(args.back, out_path=bc_path_nogamma, x_final=args.x_final, y_final=args.y_final, z_final=args.z_final,
                  x_pix=args.x_pix, y_pix=args.y_pix, z_pix=args.z_pix, nl=args.noise_level, gamma=1,
-                 mp=args.max_percentile)
+                 mp=args.max_percentile, top=topng)
 
     logger.info('writing initial transform file...')
     shift = len(front.pages)*args.z_pix-b2f_dist

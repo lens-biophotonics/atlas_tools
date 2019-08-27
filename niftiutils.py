@@ -35,7 +35,7 @@ def conv8bit(in_path, out_path=None):
 
 
 def convertImage(in_path, out_path, reverse=False, bs=100, x_final=0.025, y_final=0.025, z_final=0.025, x_pix=0.0104,
-                 y_pix=0.0104, z_pix=0.01, nl=110, gamma=0.3, mp=99.9):
+                 y_pix=0.0104, z_pix=0.01, nl=110, gamma=0.3, mp=99.9, top=-1):
     import numpy as np
     import nibabel as nib
     import os, logging
@@ -53,7 +53,8 @@ def convertImage(in_path, out_path, reverse=False, bs=100, x_final=0.025, y_fina
     temp = temp - nl
     temp = temp.clip(min=0)
     temp = np.power(temp, gamma)
-    top = np.percentile(temp, mp)
+    if top == -1:
+        top = np.percentile(temp, mp)
     temp = (temp/top)*255
     temp = temp.clip(max=255)
     if reverse:
@@ -81,6 +82,7 @@ def convertImage(in_path, out_path, reverse=False, bs=100, x_final=0.025, y_fina
 
     nib.save(nifti, out_path)
     logger.info('output image saved to %s', out_path)
+    return top
 
 
 def merge(f_path, b_path, out_path, ms, t):
