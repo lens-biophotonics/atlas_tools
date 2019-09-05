@@ -119,7 +119,7 @@ def merge(f_path, b_path, out_path, ms, t):
 
     logger.info('images merged')
 
-    out_nifti = nib.Nifti1Image(out, np.eye(4))
+    out_nifti = nib.Nifti1Image(out, None)
     out_nifti.header['pixdim'] = front.header['pixdim']
     out_nifti.header['xyzt_units'] = front.header['xyzt_units']
     out_nifti.header['datatype'] = front.header['datatype']
