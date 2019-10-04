@@ -12,7 +12,7 @@ def conv8bit(in_path, out_path=None):
     data = nifti.get_fdata()
     logger.info('input image loaded')
 
-    nifti8 = nib.Nifti1Image(data.astype('uint8'), np.eye(4))
+    nifti8 = nib.Nifti1Image(data.astype('uint8'), None)
     logger.info('image converted')
     nifti8.header['pixdim'] = nifti.header['pixdim']
     nifti8.header['xyzt_units'] = nifti.header['xyzt_units']
@@ -30,6 +30,39 @@ def conv8bit(in_path, out_path=None):
         else:
             out_path = os.path.join(base, name2 + "_8bit" + ext2 + ext)
     nib.save(nifti8, out_path)
+    logger.info('output image saved to %s', out_path)
+    return out_path
+
+
+def conv16bit(in_path, out_path=None):
+    import numpy as np
+    import nibabel as nib
+    import os.path
+    import logging
+
+    logger = logging.getLogger(__name__)
+    nifti = nib.load(in_path)
+    data = nifti.get_fdata()
+    logger.info('input image loaded')
+
+    nifti16 = nib.Nifti1Image(data.astype('uint16'), None)
+    logger.info('image converted')
+    nifti16.header['pixdim'] = nifti.header['pixdim']
+    nifti16.header['xyzt_units'] = nifti.header['xyzt_units']
+
+    # 512 is the NIFTI code for unsigned char, see https://nifti.nimh.nih.gov/nifti-1/documentation/nifti1fields/
+    nifti16.header['datatype'] = 512
+    nifti16.header['bitpix'] = 16
+
+    if out_path is None:
+        base, filename = os.path.split(in_path)
+        name, ext = os.path.splitext(filename)
+        name2, ext2 = os.path.splitext(name)
+        if ext2 == '':
+            out_path = os.path.join(base, name + "_16bit" + ext)
+        else:
+            out_path = os.path.join(base, name2 + "_16bit" + ext2 + ext)
+    nib.save(nifti16, out_path)
     logger.info('output image saved to %s', out_path)
     return out_path
 
@@ -160,6 +193,49 @@ def merge(f_path, b_path, out_path, ms, t):
     for i in range(2 * half):
         out[..., (mid - half) + i] = (slab_front[..., i] * (((2 * half - 1) - i) / (2 * half - 1))
                                       + slab_back[..., i] * (i / (2 * half - 1))).astype('uint8')
+
+    logger.info('images merged')
+
+    out_nifti = nib.Nifti1Image(out, None)
+    out_nifti.header['pixdim'] = front.header['pixdim']
+    out_nifti.header['xyzt_units'] = front.header['xyzt_units']
+    out_nifti.header['datatype'] = front.header['datatype']
+    out_nifti.header['bitpix'] = front.header['bitpix']
+
+    nib.save(out_nifti, out_path)
+    logger.info('output image saved to %s', out_path)
+
+
+def merge16(f_path, b_path, out_path, ms, t):
+    import nibabel as nib
+    import numpy as np
+    import logging
+
+    logger = logging.getLogger(__name__)
+
+    front = nib.load(f_path)
+    f_data = front.get_fdata()
+    logger.info('front image loaded')
+
+    back = nib.load(b_path)
+    b_data = back.get_fdata()
+    logger.info('back image loaded')
+
+    mid = int(float((front.header["dim"][3])) / 2) + ms
+    half = (int(float(t) / 2))
+
+    out = np.zeros(f_data.shape).astype('uint16')
+    out[..., 0:(mid - half)] = f_data[..., 0:(mid - half)]
+    out[..., (mid + half):out.shape[2]] = b_data[..., (mid + half):out.shape[2]]
+
+    slab_front = np.zeros((out.shape[0], out.shape[1], 2 * half))
+    slab_front[...] = f_data[..., (mid - half):(mid + half)]
+    slab_back = np.zeros((out.shape[0], out.shape[1], 2 * half))
+    slab_back[...] = b_data[..., (mid - half):(mid + half)]
+
+    for i in range(2 * half):
+        out[..., (mid - half) + i] = (slab_front[..., i] * (((2 * half - 1) - i) / (2 * half - 1))
+                                      + slab_back[..., i] * (i / (2 * half - 1))).astype('uint16')
 
     logger.info('images merged')
 
