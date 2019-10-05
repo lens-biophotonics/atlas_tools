@@ -247,3 +247,34 @@ def merge16(f_path, b_path, out_path, ms, t):
 
     nib.save(out_nifti, out_path)
     logger.info('output image saved to %s', out_path)
+
+
+def tif2nii(in_path, out_path, x_pix=0.025, y_pix=0.025, z_pix=0.025):
+    import numpy as np
+    import nibabel as nib
+    import os
+    import logging
+    import skimage.external.tifffile as tiff
+    from skimage.transform import rescale
+
+    logger = logging.getLogger(__name__)
+    image = tiff.imread(in_path)
+    logger.info('input image loaded')
+
+    nifti = nib.Nifti1Image(image, None)
+    nifti.header['pixdim'][1] = x_pix
+    nifti.header['pixdim'][2] = y_pix
+    nifti.header['pixdim'][3] = z_pix
+    # 2 is the NIFTI code for unsigned char, see https://nifti.nimh.nih.gov/nifti-1/documentation/nifti1fields/
+    nifti.header['datatype'] = 2
+    nifti.header['bitpix'] = 8
+    # 2 is the NIFTI code for millimeters, see https://nifti.nimh.nih.gov/nifti-1/documentation/nifti1fields/
+    nifti.header['xyzt_units'] = 2
+
+    folder, file = os.path.split(in_path)
+    if out_path == 'NULL':
+        filename, ext = os.path.splitext(file)
+        out_path = os.path.join(folder, filename + ".nii.gz")
+
+    nib.save(nifti, out_path)
+    logger.info('output image saved to %s', out_path)
