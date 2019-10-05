@@ -255,13 +255,12 @@ def tif2nii(in_path, out_path, x_pix=0.025, y_pix=0.025, z_pix=0.025):
     import os
     import logging
     import skimage.external.tifffile as tiff
-    from skimage.transform import rescale
 
     logger = logging.getLogger(__name__)
     image = tiff.imread(in_path)
     logger.info('input image loaded')
-
-    nifti = nib.Nifti1Image(image, None)
+    out_image = np.swapaxes(image, 0, 2)
+    nifti = nib.Nifti1Image(out_image, None)
     nifti.header['pixdim'][1] = x_pix
     nifti.header['pixdim'][2] = y_pix
     nifti.header['pixdim'][3] = z_pix
