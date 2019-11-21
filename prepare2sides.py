@@ -47,9 +47,12 @@ def main():
 
     fc_path = os.path.join(args.output, name + ".nii.gz")
     fc_path_nogamma = os.path.join(args.output, name + "_nogamma.nii.gz")
+    topg = convertImage(args.front, out_path=fc_path, reverse=True, bs=black, x_final=args.x_final,
+                        y_final=args.y_final, z_final=args.z_final, x_pix=args.x_pix, y_pix=args.y_pix,
+                        z_pix=args.z_pix, nl=args.noise_level, gamma=args.gamma, mp=args.max_percentile)
     topng = convertImage(args.front, out_path=fc_path_nogamma, reverse=True, bs=black, x_final=args.x_final,
-                 y_final=args.y_final, z_final=args.z_final, x_pix=args.x_pix, y_pix=args.y_pix, z_pix=args.z_pix,
-                 nl=args.noise_level, gamma=1, mp=args.max_percentile)
+                         y_final=args.y_final, z_final=args.z_final, x_pix=args.x_pix, y_pix=args.y_pix,
+                         z_pix=args.z_pix, nl=args.noise_level, gamma=1, mp=args.max_percentile)
 
     logger.info('processing back image...')
     base, back_file = os.path.split(args.back)
