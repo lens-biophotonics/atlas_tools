@@ -67,7 +67,7 @@ def conv16bit(in_path, out_path=None):
     return out_path
 
 
-def convertImage(in_path, out_path, reverse=False, bs=100, x_final=0.025, y_final=0.025, z_final=0.025, x_pix=0.0104,
+def convertImage(in_path, out_path, reverse=False, expand=False, bs=100, x_final=0.025, y_final=0.025, z_final=0.025, x_pix=0.0104,
                  y_pix=0.0104, z_pix=0.01, nl=110, gamma=0.3, mp=99.9, top=-1):
     import numpy as np
     import nibabel as nib
@@ -94,6 +94,7 @@ def convertImage(in_path, out_path, reverse=False, bs=100, x_final=0.025, y_fina
     if reverse:
         temp = np.flip(temp, 0)
         temp = np.flip(temp, 2)
+    if expand:
         temp = np.concatenate((temp, np.zeros((temp.shape[0], temp.shape[1], bs))), axis=2)
 
     out_image = temp.astype('uint8')
@@ -119,7 +120,7 @@ def convertImage(in_path, out_path, reverse=False, bs=100, x_final=0.025, y_fina
     return top
 
 
-def convertImage16(in_path, out_path, reverse=False, bs=100, x_final=0.025, y_final=0.025, z_final=0.025, x_pix=0.0104,
+def convertImage16(in_path, out_path, reverse=False, expand=False, bs=100, x_final=0.025, y_final=0.025, z_final=0.025, x_pix=0.0104,
                    y_pix=0.0104, z_pix=0.01):
     import numpy as np
     import nibabel as nib
@@ -139,6 +140,7 @@ def convertImage16(in_path, out_path, reverse=False, bs=100, x_final=0.025, y_fi
     if reverse:
         temp = np.flip(temp, 0)
         temp = np.flip(temp, 2)
+    if expand:
         temp = np.concatenate((temp, np.zeros((temp.shape[0], temp.shape[1], bs))), axis=2)
 
     out_image = temp.astype('uint16')

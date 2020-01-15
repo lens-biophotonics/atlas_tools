@@ -26,6 +26,7 @@ def main():
     parser.add_argument('-x-pix', type=float, default=0.0104, help="initial voxel size along x (in mm)")
     parser.add_argument('-y-pix', type=float, default=0.0104, help="initial voxel size along y (in mm)")
     parser.add_argument('-z-pix', type=float, default=0.01, help="initial voxel size along z (in mm)")
+    parser.add_argument('-r', '--reverse', help="revert stack direction", action='store_true')
     args = parser.parse_args()
 
     front = tiff.TiffFile(args.front)
@@ -41,15 +42,15 @@ def main():
         os.makedirs(args.output, 0o775)
 
     fc_path = os.path.join(args.output, name + "16bit.nii.gz")
-    convertImage16(args.front, out_path=fc_path, reverse=True, bs=black, x_final=args.x_final, y_final=args.y_final,
-                   z_final=args.z_final, x_pix=args.x_pix, y_pix=args.y_pix, z_pix=args.z_pix)
+    convertImage16(args.front, out_path=fc_path, expand=True, bs=black, x_final=args.x_final, y_final=args.y_final,
+                   z_final=args.z_final, x_pix=args.x_pix, y_pix=args.y_pix, z_pix=args.z_pix, reverse=not args.reverse)
 
     logger.info('processing back image...')
     base, back_file = os.path.split(args.back)
     name, ext = os.path.splitext(back_file)
     bc_path = os.path.join(args.output, name + "16bit.nii.gz")
     convertImage16(args.back, out_path=bc_path, x_final=args.x_final, y_final=args.y_final, z_final=args.z_final,
-                   x_pix=args.x_pix, y_pix=args.y_pix, z_pix=args.z_pix)
+                   x_pix=args.x_pix, y_pix=args.y_pix, z_pix=args.z_pix, reverse=args.reverse)
 
 
 if __name__ == "__main__":

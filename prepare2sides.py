@@ -31,6 +31,7 @@ def main():
     parser.add_argument('-g', '--gamma', type=float, default=0.3, help="gamma factor")
     parser.add_argument('-mp', '--max-percentile', type=float, default=99.9, help="percentage of non-saturated voxels",
                         metavar='PERCENT')
+    parser.add_argument('-r', '--reverse', help="revert stack direction", action='store_true')
     args = parser.parse_args()
 
     front = tiff.TiffFile(args.front)
@@ -47,12 +48,14 @@ def main():
 
     fc_path = os.path.join(args.output, name + ".nii.gz")
     fc_path_nogamma = os.path.join(args.output, name + "_nogamma.nii.gz")
-    topg = convertImage(args.front, out_path=fc_path, reverse=True, bs=black, x_final=args.x_final,
-                        y_final=args.y_final, z_final=args.z_final, x_pix=args.x_pix, y_pix=args.y_pix,
-                        z_pix=args.z_pix, nl=args.noise_level, gamma=args.gamma, mp=args.max_percentile)
-    topng = convertImage(args.front, out_path=fc_path_nogamma, reverse=True, bs=black, x_final=args.x_final,
-                         y_final=args.y_final, z_final=args.z_final, x_pix=args.x_pix, y_pix=args.y_pix,
-                         z_pix=args.z_pix, nl=args.noise_level, gamma=1, mp=args.max_percentile)
+
+    topg = convertImage(args.front, out_path=fc_path, expand=True, reverse=not args.reverse, bs=black,
+                        x_final=args.x_final, y_final=args.y_final, z_final=args.z_final, x_pix=args.x_pix,
+                        y_pix=args.y_pix, z_pix=args.z_pix, nl=args.noise_level, gamma=args.gamma,
+                        mp=args.max_percentile)
+    topng = convertImage(args.front, out_path=fc_path_nogamma, expand=True, reverse=not args.reverse, bs=black,
+                         x_final=args.x_final, y_final=args.y_final, z_final=args.z_final, x_pix=args.x_pix,
+                         y_pix=args.y_pix, z_pix=args.z_pix, nl=args.noise_level, gamma=1, mp=args.max_percentile)
 
     logger.info('processing back image...')
     base, back_file = os.path.split(args.back)
@@ -61,10 +64,10 @@ def main():
     bc_path_nogamma = os.path.join(args.output, name + "_nogamma.nii.gz")
     convertImage(args.back, out_path=bc_path, x_final=args.x_final, y_final=args.y_final, z_final=args.z_final,
                  x_pix=args.x_pix, y_pix=args.y_pix, z_pix=args.z_pix, nl=args.noise_level, gamma=args.gamma,
-                 mp=args.max_percentile, top=topg)
+                 mp=args.max_percentile, top=topg, reverse=args.reverse)
     convertImage(args.back, out_path=bc_path_nogamma, x_final=args.x_final, y_final=args.y_final, z_final=args.z_final,
                  x_pix=args.x_pix, y_pix=args.y_pix, z_pix=args.z_pix, nl=args.noise_level, gamma=1,
-                 mp=args.max_percentile, top=topng)
+                 mp=args.max_percentile, top=topng, reverse=args.reverse)
 
     logger.info('writing initial transform file...')
     shift = len(front.pages)*args.z_pix-b2f_dist
