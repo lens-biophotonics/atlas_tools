@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-b2f_dist = 2.68
+# b2f_dist = 2.68
 excess_border = 10
 
 
@@ -26,10 +26,11 @@ def main():
     parser.add_argument('-x-pix', type=float, default=0.0104, help="initial voxel size along x (in mm)")
     parser.add_argument('-y-pix', type=float, default=0.0104, help="initial voxel size along y (in mm)")
     parser.add_argument('-z-pix', type=float, default=0.01, help="initial voxel size along z (in mm)")
-    parser.add_argument('-r', '--reverse', help="revert stack direction", action='store_true')
+    parser.add_argument('-r', '--reverse', help="revert stack direction", action='store_true', default=False)
+    parser.add_argument('--b2f', type=float, default=2.68, help="back-to-front distance (in mm)")
     args = parser.parse_args()
 
-    front = tiff.TiffFile(args.front)
+    b2f_dist = args.b2f
     back = tiff.TiffFile(args.back)
 
     logger.info('processing front image...')

@@ -17,7 +17,7 @@ def main():
     parser.add_argument('-b', '--back', help="back (ventral) path", metavar="PATH")
     parser.add_argument('-o', '--out_path', help="output folder path", default=None, metavar="PATH")
     parser.add_argument('-ms', '--middle_shift', help="shift of the fusion slice", default=0, metavar="# OF SLICES",
-    type=int)
+                        type=int)
     parser.add_argument('-t', '--thickness', help="thickness of transition (in slices)", default=10,
                         metavar="# OF SLICES")
     parser.add_argument('-c', '--convert', help="convert back to 16 bit (if not already)", action='store_true')

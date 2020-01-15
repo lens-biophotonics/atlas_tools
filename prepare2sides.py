@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-b2f_dist = 2.68
+# b2f_dist = 2.68
 excess_border = 10
 
 
@@ -31,9 +31,10 @@ def main():
     parser.add_argument('-g', '--gamma', type=float, default=0.3, help="gamma factor")
     parser.add_argument('-mp', '--max-percentile', type=float, default=99.9, help="percentage of non-saturated voxels",
                         metavar='PERCENT')
-    parser.add_argument('-r', '--reverse', help="revert stack direction", action='store_true')
+    parser.add_argument('-r', '--reverse', help="revert stack direction", action='store_true', default=False)
+    parser.add_argument('--b2f', type=float, default=2.68, help="back-to-front distance (in mm)")
     args = parser.parse_args()
-
+    b2f_dist = args.b2f
     front = tiff.TiffFile(args.front)
     back = tiff.TiffFile(args.back)
 
