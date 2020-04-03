@@ -266,9 +266,14 @@ def tif2nii(in_path, out_path, x_pix=0.025, y_pix=0.025, z_pix=0.025):
     nifti.header['pixdim'][1] = x_pix
     nifti.header['pixdim'][2] = y_pix
     nifti.header['pixdim'][3] = z_pix
-    # 2 is the NIFTI code for unsigned char, see https://nifti.nimh.nih.gov/nifti-1/documentation/nifti1fields/
-    nifti.header['datatype'] = 2
-    nifti.header['bitpix'] = 8
+    if image.dtype == 'uint8':
+        # 2 is the NIFTI code for unsigned char, see https://nifti.nimh.nih.gov/nifti-1/documentation/nifti1fields/
+        nifti.header['datatype'] = 2
+        nifti.header['bitpix'] = 8
+    if image.dtype == 'uint16':
+	    # 512 is the NIFTI code for unsigned int16, see https://nifti.nimh.nih.gov/nifti-1/documentation/nifti1fields/
+        nifti.header['datatype'] = 512
+        nifti.header['bitpix'] = 16
     # 2 is the NIFTI code for millimeters, see https://nifti.nimh.nih.gov/nifti-1/documentation/nifti1fields/
     nifti.header['xyzt_units'] = 2
 
