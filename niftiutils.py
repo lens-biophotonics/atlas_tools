@@ -261,7 +261,10 @@ def tif2nii(in_path, out_path, x_pix=0.025, y_pix=0.025, z_pix=0.025):
     logger = logging.getLogger(__name__)
     image = tiff.imread(in_path)
     logger.info('input image loaded')
-    out_image = np.swapaxes(image, 0, 2)
+    if (image.ndim > 2):
+        out_image = np.swapaxes(image, 0, 2)
+    else:
+        out_image = image
     nifti = nib.Nifti1Image(out_image, None)
     nifti.header['pixdim'][1] = x_pix
     nifti.header['pixdim'][2] = y_pix
