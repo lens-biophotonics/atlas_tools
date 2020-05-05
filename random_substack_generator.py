@@ -31,9 +31,9 @@ def main():
 
     for n in range(args.nstacks):
         logger.info('generating substack # %d' % n)
-        x = random.randint(0, limits-(args.xsize+1))
-        y = random.randint(0, limits-(args.ysize+1))
-        z = random.randint(0, limits-(args.zsize+1))
+        x = random.randint(0, limits[2]-(args.xsize+1))
+        y = random.randint(0, limits[1]-(args.ysize+1))
+        z = random.randint(0, limits[0]-(args.zsize+1))
 
         temp = vfv[z:(z+args.zsize), y:(y+args.ysize), x:(x+args.xsize)]
         path = os.path.join(args.output, args.suffix + '_%04d_%05d_%05d.tiff' % (z, y, x))
