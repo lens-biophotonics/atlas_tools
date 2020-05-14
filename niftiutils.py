@@ -67,8 +67,8 @@ def conv16bit(in_path, out_path=None):
     return out_path
 
 
-def convertImage(in_path, out_path, reverse=False, expand=False, bs=100, x_final=0.025, y_final=0.025, z_final=0.025, x_pix=0.0104,
-                 y_pix=0.0104, z_pix=0.01, nl=110, gamma=0.3, mp=99.9, top=-1):
+def convertImage(in_path, out_path, reverse=False, expand=False, bs=100, x_final=0.025, y_final=0.025, z_final=0.025,
+                 x_pix=0.0104, y_pix=0.0104, z_pix=0.01, nl=110, gamma=0.3, mp=99.9, top=-1):
     import numpy as np
     import nibabel as nib
     import os
@@ -120,8 +120,8 @@ def convertImage(in_path, out_path, reverse=False, expand=False, bs=100, x_final
     return top
 
 
-def convertImage16(in_path, out_path, reverse=False, expand=False, bs=100, x_final=0.025, y_final=0.025, z_final=0.025, x_pix=0.0104,
-                   y_pix=0.0104, z_pix=0.01):
+def convertImage16(in_path, out_path, reverse=False, expand=False, bs=100, x_final=0.025, y_final=0.025, z_final=0.025,
+                   x_pix=0.0104, y_pix=0.0104, z_pix=0.01):
     import numpy as np
     import nibabel as nib
     import os
