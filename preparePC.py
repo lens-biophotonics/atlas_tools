@@ -51,8 +51,8 @@ def main():
     back['y'] = back['y'] * args.xy_pix
     back['z'] = back['z'] * args.z_pix
 
-    base, front_file = os.path.split(args.front)
-    name, ext = os.path.splitext(front_file)
+    base, back_file = os.path.split(args.back)
+    name, ext = os.path.splitext(back_file)
     out_path = os.path.join(args.output, name + "_ants.csv")
     front.to_csv(out_path, index=False)
     logger.info('point cloud saved to %s', out_path)
