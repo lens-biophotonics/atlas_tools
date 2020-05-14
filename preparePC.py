@@ -56,3 +56,7 @@ def main():
     out_path = os.path.join(args.output, name + "_ants.csv")
     front.to_csv(out_path, index=False)
     logger.info('point cloud saved to %s', out_path)
+
+
+if __name__ == "__main__":
+    main()

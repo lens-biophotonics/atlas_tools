@@ -34,3 +34,7 @@ def main():
     wb = pd.concat([front_2, back_2])
     wb.to_csv(args.output, index=False)
     logger.info('point cloud saved to %s', args.output)
+
+
+if __name__ == "__main__":
+    main()
