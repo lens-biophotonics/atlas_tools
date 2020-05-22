@@ -5,7 +5,6 @@ def main():
     import logging
     import coloredlogs
     import pandas as pd
-    import os
     import argparse
 
     logger = logging.getLogger(__name__)
