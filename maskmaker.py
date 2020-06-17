@@ -6,7 +6,7 @@ def main():
     import coloredlogs
     import argparse
     import skimage.external.tifffile as tiff
-    import scipy.ndimage.binary_opening as opening
+    from scipy.ndimage import binary_opening as opening
 
     logger = logging.getLogger(__name__)
     logging.basicConfig(format='[%(funcName)s] - %(asctime)s - %(message)s', level=logging.INFO)
@@ -21,10 +21,10 @@ def main():
 
     logger.info('opening %s...', args.input)
     in_image = tiff.imread(args.input)
-    out_image = ((in_image > args.threshold)*255).astype('uint8')
+    out_image = ((in_image > args.threshold))
     out_image = opening(out_image, iterations=2)
     logger.info('writing result to %s...', args.output)
-    tiff.imsave(args.output, out_image)
+    tiff.imsave(args.output, (out_image*255).astype('uint8'))
 
 
 if __name__ == "__main__":
