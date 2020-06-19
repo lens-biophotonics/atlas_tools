@@ -54,7 +54,7 @@ def main():
     base, back_file = os.path.split(args.back)
     name, ext = os.path.splitext(back_file)
     out_path = os.path.join(args.output, name + "_ants.csv")
-    front.to_csv(out_path, index=False)
+    back.to_csv(out_path, index=False)
     logger.info('point cloud saved to %s', out_path)
 
 
