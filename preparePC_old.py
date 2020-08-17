@@ -1,7 +1,5 @@
 #!/usr/bin/python3
 
-niftisize = 0.025  # voxel size (in mm) of nifti file
-
 
 def main():
     import logging
@@ -10,7 +8,6 @@ def main():
     import os
     import argparse
     from zetastitcher import VirtualFusedVolume
-    import nibabel as nib
 
     logger = logging.getLogger(__name__)
     logging.basicConfig(format='[%(funcName)s] - %(asctime)s - %(message)s', level=logging.INFO)
@@ -20,13 +17,9 @@ def main():
     parser.add_argument('-f', '--front', help="front .csv file", metavar='PATH')
     parser.add_argument('-b', '--back', help="back .csv file", metavar='PATH')
     parser.add_argument('-o', '--output', help="output base path", metavar='PATH')
-    parser.add_argument('-fy', '--front_yml', help="front stitch.yml file", metavar='PATH')
-    parser.add_argument('-by', '--back_yml', help="back stitch.yml file", metavar='PATH')
-    parser.add_argument('-r', '--reverse', type=bool, default=False, help="reverse front?")
-    parser.add_argument('-xy-pix', type=float, default=0.00065, help="voxel size along xy (in mm)")
-    parser.add_argument('-z-pix', type=float, default=0.002, help="voxel size along z (in mm)")
-    parser.add_argument('-xy-pc', type=float, default=0.001, help="xy point cloud units (in mm)")
-    parser.add_argument('-z-pc', type=float, default=0.001, help="z point cloud units (in mm)")
+    parser.add_argument('-y', '--yml', help="front stitch.yml file", metavar='PATH')
+    parser.add_argument('-xy-pix', type=float, default=0.00065, help="initial voxel size along x and y (in mm)")
+    parser.add_argument('-z-pix', type=float, default=0.002, help="initial voxel size along z (in mm)")
 
     args = parser.parse_args()
 
@@ -34,16 +27,12 @@ def main():
     front = pd.read_csv(args.front)
     front = front[['x', 'y', 'z']]
 
-    if args.reverse:
-        front['x'] *= args.xy_pc
-        front['y'] *= args.xy_pc
-        front['z'] *= args.z_pc
-    else:
-        fvfv = VirtualFusedVolume(args.front_yml)
-        fshape = fvfv.shape
-        front['x'] = (fshape[2] * args.xy_pix) - (front['x'] * args.xy_pc)
-        front['y'] *= args.xy_pc
-        front['z'] = (fshape[0] * args.z_pix) - (front['z'] * args.z_pc)
+    vfv = VirtualFusedVolume(args.yml)
+    shape = vfv.shape
+
+    front['x'] = (shape[2] - front['x']) * args.xy_pix
+    front['y'] = front['y'] * args.xy_pix
+    front['z'] = (shape[0] - front['z']) * args.z_pix
 
     if not os.path.exists(args.output):
         os.makedirs(args.output, 0o775)
@@ -58,16 +47,9 @@ def main():
     back = pd.read_csv(args.back)
     back = back[['x', 'y', 'z']]
 
-    if args.reverse:
-        bvfv = VirtualFusedVolume(args.back_yml)
-        bshape = bvfv.shape
-        back['x'] = (bshape[2] * args.xy_pix) - (back['x'] * args.xy_pc)
-        back['y'] *= args.xy_pc
-        back['z'] = (bshape[0] * args.z_pix) - (back['z'] * args.z_pc)
-    else:
-        back['x'] *= args.xy_pc
-        back['y'] *= args.xy_pc
-        back['z'] *= args.z_pc
+    back['x'] = back['x'] * args.xy_pix
+    back['y'] = back['y'] * args.xy_pix
+    back['z'] = back['z'] * args.z_pix
 
     base, back_file = os.path.split(args.back)
     name, ext = os.path.splitext(back_file)
