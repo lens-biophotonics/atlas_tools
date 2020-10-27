@@ -4,7 +4,7 @@
 AX = 11.4  # x size (in mm) of Allen atlas reference
 AY = 15.0  # y size (in mm) of Allen atlas reference
 AZ = 8.0   # z size (in mm) of Allen atlas reference
-AD = 8.42  # maximum distance (in mm) between hippocampi in Allen atlas reference
+AD = 8.5  # maximum distance (in mm) between hippocampi in Allen atlas reference
 
 
 def main():
