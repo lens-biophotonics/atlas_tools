@@ -283,6 +283,7 @@ def tif2nii(in_path, out_path, x_pix=0.025, y_pix=0.025, z_pix=0.025):
 
 def nii2tif(in_path, out_path):
 
+    import numpy as np
     import nibabel as nib
     import os
     import logging
