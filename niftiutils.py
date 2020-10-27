@@ -295,7 +295,7 @@ def nii2tif(in_path, out_path):
     image = nifti.get_fdata()
     image = np.swapaxes(image, 0, 1)
     image = np.swapaxes(image, 0, 2)
-    image = np.swapaxes(image, 0, 1)
+    image = np.swapaxes(image, 1, 2)
 
     folder, file = os.path.split(in_path)
     if out_path == 'NULL':
