@@ -296,7 +296,7 @@ def nii2tif(in_path, out_path):
     folder, file = os.path.split(in_path)
     if out_path == 'NULL':
         filename, ext = os.path.splitext(file)
-        out_path = os.path.join(folder, filename + ".nii.gz")
+        out_path = os.path.join(folder, filename + ".tif")
 
     tiff.imwrite(out_path, image.astype('uint8'))
     logger.info('output image saved to %s', out_path)
