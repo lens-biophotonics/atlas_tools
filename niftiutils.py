@@ -279,3 +279,24 @@ def tif2nii(in_path, out_path, x_pix=0.025, y_pix=0.025, z_pix=0.025):
 
     nib.save(nifti, out_path)
     logger.info('output image saved to %s', out_path)
+
+
+def nii2tif(in_path, out_path):
+
+    import nibabel as nib
+    import os
+    import logging
+    import tifffile as tiff
+
+    logger = logging.getLogger(__name__)
+    nifti = nib.load(in_path)
+    logger.info('input image loaded')
+    image = nifti.get_fdata()
+
+    folder, file = os.path.split(in_path)
+    if out_path == 'NULL':
+        filename, ext = os.path.splitext(file)
+        out_path = os.path.join(folder, filename + ".nii.gz")
+
+    tiff.imwrite(out_path, image.astype('uint8'))
+    logger.info('output image saved to %s', out_path)
