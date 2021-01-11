@@ -55,10 +55,11 @@ def main():
         for index, element in coord.iterrows():
             x = element['x'] * args.scalexy + random.randint(-50, 50)
             y = element['y'] * args.scalexy + random.randint(-50, 50)
-            z = element['z'] * args.scalexy + random.randint(-20, 20)
+            z = element['z'] * args.scalez + random.randint(-20, 20)
 
             temp = vfv[z:(z + args.zsize), y:(y + args.ysize), x:(x + args.xsize)]
             path = os.path.join(args.output, args.suffix + '_%04d_%05d_%05d.tiff' % (z, y, x))
+            logger.info('subvolume saved to file %s', path)
             tiff.imsave(path, temp)
 
 
