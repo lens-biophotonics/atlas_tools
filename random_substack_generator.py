@@ -25,7 +25,7 @@ def main():
     parser.add_argument('-xs', '--xsize', type=int, default=480, help="x size of the substack (in voxels)")
     parser.add_argument('-ys', '--ysize', type=int, default=480, help="y size of the substack (in voxels)")
     parser.add_argument('-zs', '--zsize', type=int, default=480, help="z size of the substack (in voxels)")
-    parser.add_argument('-t', '--threshold', type=int, default=150, help="threshold of 95% percentile")
+    parser.add_argument('-t', '--threshold', type=int, default=150, help="threshold of 95%% percentile")
     parser.add_argument('-sxy', '--scalexy', type=int, default=16, help="scaling factor in xy")
     parser.add_argument('-sz', '--scalez', type=int, default=5, help="scaling factor in z")
 
