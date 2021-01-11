@@ -52,10 +52,10 @@ def main():
 
     else:
         coord = pd.read_csv(args.coordinates)
-        for element in coord:
-            x = int(element['x'] * args.scalexy) + random.randint(-50, 50)
-            y = int(element['y'] * args.scalexy) + random.randint(-50, 50)
-            z = int(element['z'] * args.scalexy) + random.randint(-20, 20)
+        for index, element in coord.iterrows():
+            x = element['x'] * args.scalexy + random.randint(-50, 50)
+            y = element['y'] * args.scalexy + random.randint(-50, 50)
+            z = element['z'] * args.scalexy + random.randint(-20, 20)
 
             temp = vfv[z:(z + args.zsize), y:(y + args.ysize), x:(x + args.xsize)]
             path = os.path.join(args.output, args.suffix + '_%04d_%05d_%05d.tiff' % (z, y, x))
