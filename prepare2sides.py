@@ -1,4 +1,4 @@
-#!/usr/local/bin/python3
+#!/usr/bin/python3
 
 # b2f_dist = 2.68
 excess_border = 10

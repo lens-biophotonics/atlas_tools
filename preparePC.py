@@ -1,4 +1,4 @@
-#!/usr/local/bin/python3
+#!/usr/bin/python3
 
 niftisize = 0.025  # voxel size (in mm) of nifti file
 

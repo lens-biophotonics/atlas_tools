@@ -1,13 +1,11 @@
-#!/usr/local/bin/python3
+#!/usr/bin/python3
 
 
 def main():
     from niftiutils import tif2nii
     import logging
     import coloredlogs
-    import os
     import argparse
-    import skimage.external.tifffile as tiff
 
     logger = logging.getLogger(__name__)
     logging.basicConfig(format='[%(funcName)s] - %(asctime)s - %(message)s', level=logging.INFO)
