@@ -73,7 +73,7 @@ def convertImage(in_path, out_path, reverse=False, expand=False, bs=100, x_final
     import nibabel as nib
     import os
     import logging
-    import skimage.external.tifffile as tiff
+    import tifffile as tiff
     from skimage.transform import rescale
 
     logger = logging.getLogger(__name__)
@@ -126,7 +126,7 @@ def convertImage16(in_path, out_path, reverse=False, expand=False, bs=100, x_fin
     import nibabel as nib
     import os
     import logging
-    import skimage.external.tifffile as tiff
+    import tifffile as tiff
     from skimage.transform import rescale
 
     logger = logging.getLogger(__name__)
@@ -256,7 +256,7 @@ def tif2nii(in_path, out_path, x_pix=0.025, y_pix=0.025, z_pix=0.025):
     import nibabel as nib
     import os
     import logging
-    import skimage.external.tifffile as tiff
+    import tifffile as tiff
 
     logger = logging.getLogger(__name__)
     image = tiff.imread(in_path)
