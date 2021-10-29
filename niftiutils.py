@@ -2,7 +2,6 @@
 
 
 def conv8bit(in_path, out_path=None):
-    import numpy as np
     import nibabel as nib
     import os.path
     import logging
@@ -35,7 +34,6 @@ def conv8bit(in_path, out_path=None):
 
 
 def conv16bit(in_path, out_path=None):
-    import numpy as np
     import nibabel as nib
     import os.path
     import logging
@@ -73,11 +71,11 @@ def convertImage(in_path, out_path, reverse=False, expand=False, bs=100, x_final
     import nibabel as nib
     import os
     import logging
-    import tifffile as tiff
+    from zetastitcher import InputFile
     from skimage.transform import rescale
 
     logger = logging.getLogger(__name__)
-    in_image = tiff.imread(in_path)
+    in_image = InputFile(in_path)
     logger.info('input image loaded')
 
     temp = rescale(np.swapaxes(in_image, 0, 2), scale=((x_pix / x_final), (y_pix / y_final), (z_pix / z_final)),
@@ -126,11 +124,11 @@ def convertImage16(in_path, out_path, reverse=False, expand=False, bs=100, x_fin
     import nibabel as nib
     import os
     import logging
-    import tifffile as tiff
+    from zetastitcher import InputFile
     from skimage.transform import rescale
 
     logger = logging.getLogger(__name__)
-    in_image = tiff.imread(in_path)
+    in_image = InputFile(in_path)
     logger.info('input image loaded')
 
     temp = rescale(np.swapaxes(in_image, 0, 2), scale=((x_pix / x_final), (y_pix / y_final), (z_pix / z_final)),
@@ -256,10 +254,10 @@ def tif2nii(in_path, out_path, x_pix=0.025, y_pix=0.025, z_pix=0.025):
     import nibabel as nib
     import os
     import logging
-    import tifffile as tiff
+    from zetastitcher import InputFile
 
     logger = logging.getLogger(__name__)
-    image = tiff.imread(in_path)
+    image = InputFile(in_path)
     logger.info('input image loaded')
     out_image = np.swapaxes(image, 0, 2)
     nifti = nib.Nifti1Image(out_image, None)
