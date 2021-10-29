@@ -75,7 +75,8 @@ def convertImage(in_path, out_path, reverse=False, expand=False, bs=100, x_final
     from skimage.transform import rescale
 
     logger = logging.getLogger(__name__)
-    in_image = InputFile(in_path)
+    handle = InputFile(in_path)
+    in_image = handle.whole()
     logger.info('input image loaded')
 
     temp = rescale(np.swapaxes(in_image, 0, 2), scale=((x_pix / x_final), (y_pix / y_final), (z_pix / z_final)),
@@ -128,7 +129,8 @@ def convertImage16(in_path, out_path, reverse=False, expand=False, bs=100, x_fin
     from skimage.transform import rescale
 
     logger = logging.getLogger(__name__)
-    in_image = InputFile(in_path)
+    handle = InputFile(in_path)
+    in_image = handle.whole()
     logger.info('input image loaded')
 
     temp = rescale(np.swapaxes(in_image, 0, 2), scale=((x_pix / x_final), (y_pix / y_final), (z_pix / z_final)),
