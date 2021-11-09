@@ -5,7 +5,8 @@ def main():
     import logging
     import coloredlogs
     import argparse
-    import skimage.external.tifffile as tiff
+    from zetastitcher import InputFile
+    import tifffile as tiff
     from scipy.ndimage import binary_opening as opening
 
     logger = logging.getLogger(__name__)
@@ -20,11 +21,12 @@ def main():
     args = parser.parse_args()
 
     logger.info('opening %s...', args.input)
-    in_image = tiff.imread(args.input)
+    handle = InputFile(args.input)
+    in_image = handle.whole()
     out_image = ((in_image > args.threshold))
     out_image = opening(out_image, iterations=2)
     logger.info('writing result to %s...', args.output)
-    tiff.imsave(args.output, (out_image*255).astype('uint8'))
+    tiff.imwrite(args.output, (out_image*255).astype('uint8'), compression='zlib')
 
 
 if __name__ == "__main__":
