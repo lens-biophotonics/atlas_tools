@@ -10,7 +10,7 @@ def main():
     import coloredlogs
     import os
     import argparse
-    import skimage.external.tifffile as tiff
+    import tifffile as tiff
 
     logger = logging.getLogger(__name__)
     logging.basicConfig(format='[%(funcName)s] - %(asctime)s - %(message)s', level=logging.INFO)

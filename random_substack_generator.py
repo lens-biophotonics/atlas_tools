@@ -6,7 +6,7 @@ def main():
     import coloredlogs
     import os
     import argparse
-    import skimage.external.tifffile as tiff
+    import tifffile as tiff
     from zetastitcher import VirtualFusedVolume
     import random
     import numpy as np
@@ -47,7 +47,7 @@ def main():
             temp = vfv[z:(z+args.zsize), y:(y+args.ysize), x:(x+args.xsize)]
             if np.percentile(temp, 95) > args.threshold:
                 path = os.path.join(args.output, args.suffix + '_%04d_%05d_%05d.tiff' % (z, y, x))
-                tiff.imsave(path, temp)
+                tiff.imwrite(path, temp, compression='zlib')
                 n = n+1
 
     else:
@@ -60,7 +60,7 @@ def main():
             temp = vfv[z:(z + args.zsize), y:(y + args.ysize), x:(x + args.xsize)]
             path = os.path.join(args.output, args.suffix + '_%04d_%05d_%05d.tiff' % (z, y, x))
             logger.info('subvolume saved to file %s', path)
-            tiff.imsave(path, temp)
+            tiff.imwrite(path, temp, compression='zlib')
 
 
 if __name__ == "__main__":

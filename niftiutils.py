@@ -302,5 +302,5 @@ def nii2tif(in_path, out_path):
         filename, ext = os.path.splitext(file)
         out_path = os.path.join(folder, filename + ".tif")
 
-    tiff.imwrite(out_path, image.astype('uint8'))
+    tiff.imwrite(out_path, image.astype('uint8'), compression='zlib')
     logger.info('output image saved to %s', out_path)
