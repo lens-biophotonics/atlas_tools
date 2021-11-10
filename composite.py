@@ -8,6 +8,7 @@ def main():
     import os
     import argparse
     import numpy as np
+    from zetastitcher import InputFile
 
     logger = logging.getLogger(__name__)
     logging.basicConfig(format='[%(funcName)s] - %(asctime)s - %(message)s', level=logging.INFO)
@@ -25,19 +26,22 @@ def main():
     for name in green_dir:
         if 'x_' in name:
             green_path = os.path.join(args.green, name)
-            green = tifffile.imread(green_path)
+            handle = InputFile(green_path)
+            green = handle.whole()
             logger.info('opened GREEN image %s', green_path)
             token = name[0:17]
             red_name = next((name2 for name2 in red_dir if token in name2), None)
             red_path = os.path.join(args.red, red_name)
-            red = tifffile.imread(red_path)
+            handle = InputFile(red_path)
+            red = handle.whole()
             logger.info('opened RED image %s', red_path)
             shape = green.shape
             merge = np.zeros((shape[0], 2, shape[1], shape[2])).astype(green.dtype)
             merge[:, 0, ...] = red
             merge[:, 1, ...] = green
             merge_path = os.path.join(args.output, name)
-            tifffile.imwrite(merge_path, merge, imagej=True, photometric=True, metadata={'mode':'composite'})
+            tifffile.imwrite(merge_path, merge, imagej=True, photometric=True, metadata={'mode':'composite'},
+                             compression='zlib')
             logger.info('composite image saved to %s', merge_path)
 
 
