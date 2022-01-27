@@ -1,5 +1,4 @@
-#!/usr/bin/python3
-
+#!/usr/bin/env python3
 
 def conv8bit(in_path, out_path=None):
     import nibabel as nib
