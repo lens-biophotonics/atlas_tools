@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 
 # this script works referred to the Allen atlas reference (expanded in y) at 25 micron resolution
 AX = 11.4  # x size (in mm) of Allen atlas reference
