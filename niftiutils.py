@@ -259,7 +259,8 @@ def tif2nii(in_path, out_path, x_pix=0.025, y_pix=0.025, z_pix=0.025):
     from zetastitcher import InputFile
 
     logger = logging.getLogger(__name__)
-    image = InputFile(in_path)
+    imfile = InputFile(in_path)
+    image = imfile.whole()
     logger.info('input image loaded')
     out_image = np.swapaxes(image, 0, 2)
     nifti = nib.Nifti1Image(out_image, None)
