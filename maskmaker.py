@@ -1,8 +1,5 @@
 #!/usr/bin/env python3
-<<<<<<< HEAD
 
-=======
->>>>>>> 28be56b0bea951e6340e5ea39c2b59b9b4151723
 
 def main():
     import logging
