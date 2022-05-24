@@ -66,7 +66,7 @@ def conv16bit(in_path, out_path=None):
 
 
 def convertImage(in_path, out_path, reverse=False, expand=False, bs=100, x_final=0.025, y_final=0.025, z_final=0.025,
-                 x_pix=0.0104, y_pix=0.0104, z_pix=0.01, nl=110, gamma=0.3, mp=99.9, top=-1):
+                 x_pix=0.0104, y_pix=0.0104, z_pix=0.01, nl=110, gamma=0.3, mp=99.9, top=-1, flip=False, mask=None):
     import numpy as np
     import nibabel as nib
     import os
@@ -78,6 +78,9 @@ def convertImage(in_path, out_path, reverse=False, expand=False, bs=100, x_final
     handle = InputFile(in_path)
     in_image = handle.whole()
     logger.info('input image loaded')
+
+    if mask is not None:
+        in_image = in_image * mask
 
     temp = rescale(np.swapaxes(in_image, 0, 2), scale=((x_pix / x_final), (y_pix / y_final), (z_pix / z_final)),
                    multichannel=False, anti_aliasing=False, preserve_range=True)
@@ -93,6 +96,8 @@ def convertImage(in_path, out_path, reverse=False, expand=False, bs=100, x_final
     if reverse:
         temp = np.flip(temp, 0)
         temp = np.flip(temp, 2)
+    if flip:
+        temp = np.flip(temp, 1)
     if expand:
         temp = np.concatenate((temp, np.zeros((temp.shape[0], temp.shape[1], bs))), axis=2)
 
