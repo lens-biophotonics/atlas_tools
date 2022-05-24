@@ -83,7 +83,7 @@ def convertImage(in_path, out_path, reverse=False, expand=False, bs=100, x_final
         in_image = in_image * mask
 
     temp = rescale(np.swapaxes(in_image, 0, 2), scale=((x_pix / x_final), (y_pix / y_final), (z_pix / z_final)),
-                   multichannel=False, anti_aliasing=False, preserve_range=True)
+                   channel_axis=None, anti_aliasing=False, preserve_range=True)
     logger.info('image downscaled')
 
     temp = temp - nl
@@ -139,7 +139,7 @@ def convertImage16(in_path, out_path, reverse=False, expand=False, bs=100, x_fin
     logger.info('input image loaded')
 
     temp = rescale(np.swapaxes(in_image, 0, 2), scale=((x_pix / x_final), (y_pix / y_final), (z_pix / z_final)),
-                   multichannel=False, anti_aliasing=False, preserve_range=True)
+                   channel_axis=None, anti_aliasing=False, preserve_range=True)
     logger.info('image downscaled')
 
     if reverse:
