@@ -24,7 +24,7 @@ def main():
     parser.add_argument('-x-pix', type=float, default=0.0104, help="initial voxel size along x (in mm)")
     parser.add_argument('-y-pix', type=float, default=0.0104, help="initial voxel size along y (in mm)")
     parser.add_argument('-z-pix', type=float, default=0.01, help="initial voxel size along z (in mm)")
-    parser.add_argument('-nl', '--noise-level', type=int, default=110, help="average noise to be subtracted from image",
+    parser.add_argument('-nl', '--noiselevel', type=int, default=110, help="average noise to be subtracted from image",
                         metavar='LEVEL')
     parser.add_argument('-g', '--gamma', type=float, default=0.3, help="gamma factor")
     parser.add_argument('-s', '--sigma', type=float, default=5.0, help="smoothing sigma")
@@ -37,21 +37,23 @@ def main():
     red = InputFile(args.red)
     rimage = red.whole()
     rimage = gaussian_filter(rimage, args.sigma)
-    rimage = (rimage > args.noise-level)
+    rimage = (rimage > args.noiselevel)
 
     logger.info('processing yellow image...')
     # check if output folder exists
+    base, y_file = os.path.split(args.yellow)
+    name, ext = os.path.splitext(y_file)
     if not os.path.exists(args.output):
         os.makedirs(args.output, 0o775)
     path = os.path.join(args.output, name + ".nii.gz")
     path_nogamma = os.path.join(args.output, name + "_nogamma.nii.gz")
 
     convertImage(args.yellow, out_path=path, x_final=args.x_final, y_final=args.y_final, z_final=args.z_final,
-                 x_pix=args.x_pix, y_pix=args.y_pix, z_pix=args.z_pix, nl=args.noise_level, gamma=args.gamma,
+                 x_pix=args.x_pix, y_pix=args.y_pix, z_pix=args.z_pix, nl=args.noiselevel, gamma=args.gamma,
                  mp=args.max_percentile, flip=args.flip, mask=rimage)
     convertImage(args.yellow, out_path=path_nogamma, x_final=args.x_final, y_final=args.y_final,
                  z_final=args.z_final, x_pix=args.x_pix, y_pix=args.y_pix, z_pix=args.z_pix,
-                 nl=args.noise_level, gamma=1, mp=args.max_percentile, flip=args.flip, mask=rimage)
+                 nl=args.noiselevel, gamma=1, mp=args.max_percentile, flip=args.flip, mask=rimage)
 
 
 if __name__ == "__main__":
