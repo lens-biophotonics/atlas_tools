@@ -56,7 +56,7 @@ def main():
     scale = np.sqrt(scalevec.mean())
 
     a11 = scale * (np.abs(i_eigvec[0, 0]))
-    a12 = -(i_eigvec[0, 1] * np.sign(i_eigvec[0, 0]))
+    a12 = (i_eigvec[0, 1] * np.sign(i_eigvec[0, 0]))
     a13 = 0
     a21 = -a12
     a22 = a11
