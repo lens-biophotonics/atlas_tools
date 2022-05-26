@@ -55,8 +55,11 @@ def main():
     scalevec = i_eigval/r_eigval
     scale = np.sqrt(scalevec.mean())
 
-    a11 = scale * (np.abs(i_eigvec[0, 0]))
-    a12 = (i_eigvec[0, 1] * np.sign(i_eigvec[0, 0]))
+    sinus = i_eigvec[0, 1] * np.sign(i_eigvec[0, 0])
+    cosinus = np.abs(i_eigvec[0, 0])
+
+    a11 = scale * cosinus
+    a12 = scale * sinus
     a13 = 0
     a21 = -a12
     a22 = a11
@@ -64,9 +67,9 @@ def main():
     a31 = 0
     a32 = 0
     a33 = scale
-    a41 = scale * (ix - rx) / 2
-    a42 = scale * (iy - ry) / 2
-    a43 = scale * (iz - rz) / 2
+    a41 = (ix / 2) * (1 - cosinus) + (iy / 2) * sinus
+    a42 = (iy / 2) * (1 - cosinus) - (ix / 2) * sinus
+    a43 = 1
 
     file = open(args.output, "w")
     file.write("#Insight Transform File V1.0\n")
@@ -74,7 +77,7 @@ def main():
     file.write("Transform: AffineTransform_double_3_3\n")
     file.write("Parameters: %0.2f %0.2f %0.2f %0.2f %0.2f %0.2f %0.2f %0.2f %0.2f %0.2f %0.2f %0.2f\n"
                % (a11, a12, a13, a21, a22, a23, a31, a32, a33, a41, a42, a43))
-    file.write("FixedParameters: %0.2f %0.2f %0.2f\n" % (rx / 2, ry / 2, rz / 2))
+    file.write("FixedParameters: 0.00 0.00 0.00\n")
     file.close()
 
 
