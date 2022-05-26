@@ -67,8 +67,8 @@ def main():
     a31 = 0
     a32 = 0
     a33 = scale
-    a41 = (ix / 2) * (1 - cosinus) + (iy / 2) * sinus
-    a42 = (iy / 2) * (1 - cosinus) - (ix / 2) * sinus
+    a41 = (ix / 2) * (1 - cosinus) - (iy / 2) * sinus
+    a42 = (iy / 2) * (1 - cosinus) + (ix / 2) * sinus
     a43 = 1
 
     file = open(args.output, "w")
