@@ -30,8 +30,8 @@ def main():
     s2z = args.s2z
 
     logger.info('preparing DoG kernel...')
-    sizexy = int(args.s2xy) * 2 -1
-    sizez = int(args.s2z) * 2 - 1
+    sizexy = int(s2xy) * 2 -1
+    sizez = int(s2z) * 2 - 1
     dog_kernel = np.zeros((sizez, sizexy, sizexy))
     metaxy = (sizexy - 1) / 2
     metaz = (sizez - 1) / 2
