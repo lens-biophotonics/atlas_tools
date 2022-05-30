@@ -36,7 +36,7 @@ def main():
     f1 = []
     for element in lista:
         logger.info('processing file %s', element)
-        handle = InputFile(element)
+        handle = InputFile(os.path.join(args.input,element))
         image = handle.whole()
         detected = blob_detector(image, args.s1xy, args.s1z, args.s2xy, args.s2z, args.t)
         true = np.genfromtxt(os.path.join(args.i, element + '.marker'), delimiter=',', skip_header=1)
