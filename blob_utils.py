@@ -88,6 +88,9 @@ def compare_points(p1, p2, threshold):
     logging.basicConfig(format='[%(funcName)s] - %(asctime)s - %(message)s', level=logging.INFO)
     coloredlogs.install(level='DEBUG', logger=logger)
 
+    if len(p2.shape) == 1:
+        p2 = np.tile(p2, (2,1))
+
     t2 = KDTree(p2)
     tp = []
     fn = []
