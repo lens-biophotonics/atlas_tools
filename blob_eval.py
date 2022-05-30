@@ -57,8 +57,14 @@ def main():
         tp.append(local_tp)
         fp.append(local_fp)
         fn.append(local_fn)
-        prec.append(local_tp / (local_tp + local_fp))
-        rec.append(local_tp / (local_tp + local_fn))
+        try:
+            prec.append(local_tp / (local_tp + local_fp))
+        except:
+            prec.append(0)
+        try:
+            rec.append(local_tp / (local_tp + local_fn))
+        except:
+            rec.append(0)
         f1.append(2 * local_tp / (2 * local_tp + local_fp + local_fn))
 
     total_tp = np.sum(tp)
