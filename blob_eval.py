@@ -39,7 +39,8 @@ def main():
         handle = InputFile(os.path.join(args.input,element))
         image = handle.whole()
         detected = blob_detector(image, args.s1xy, args.s1z, args.s2xy, args.s2z, args.t)
-        true = np.genfromtxt(os.path.join(args.i, element + '.marker'), delimiter=',', skip_header=1)
+        true = np.genfromtxt(os.path.join(args.input, element + '.marker'), delimiter=',', skip_header=1)
+        true = true[:, 0:3]
         local_tp, local_fp, local_fn = compare_points(detected, true, args.d)
         tp.append(local_tp)
         fp.append(local_fp)
