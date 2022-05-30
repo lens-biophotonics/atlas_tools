@@ -42,7 +42,7 @@ def blob_detector(image, s1xy=18.0, s1z=10.0, s2xy=26.0, s2z=14.0, threshold=300
 
     logger.info('processing image...')
     conv = dog_filter(image, s1xy, s1z, s2xy, s2z)
-    peak = peak_local_max(conv)
+    peak = peak_local_max(conv, threshold_abs=threshold)
 
     return peak
 
@@ -59,7 +59,6 @@ def draw_balls(shape, peak, radius):
     logger.info('creating ball...')
     axis = np.arange(-radius, radius + 1)
     x, y, z = np.meshgrid(axis, axis, axis)
-    subr = radius / 2
     ball = np.heaviside((radius ** 2 - x ** 2 - y ** 2 - z ** 2), 1)
 
     logger.info('drawing balls on image...')
