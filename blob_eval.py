@@ -26,7 +26,7 @@ def main():
     args = parser.parse_args()
 
     logger.info('initializing...')
-    lista = os.listdir(args.i)
+    lista = os.listdir(args.input)
     lista = [x for x in lista if 'tif' in x and 'marker' not in x]
     tp = []
     fp = []
@@ -58,7 +58,7 @@ def main():
     df = pd.DataFrame(zip(lista, tp, fp, fn, prec, rec, f1), columns=['filename', 'true positives', 'false positives',
                                                                       'false negatives', 'precision', 'recall',
                                                                       'f1-score'])
-    pd_file = os.path.join(args.o, 'eval.csv')
+    pd_file = os.path.join(args.output, 'eval.csv')
     logger.info('writing results...')
     df.to_csv(pd_file, index=False)
     sum_file = os.path.join(args.o, 'summary,csv')
