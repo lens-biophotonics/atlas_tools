@@ -5,6 +5,7 @@ def dog_filter(image, s1xy=18.0, s1z=10.0, s2xy=26.0, s2z=14.0):
     from scipy.signal import fftconvolve
     import logging
     import coloredlogs
+    import numpy as np
 
     logger = logging.getLogger(__name__)
     logging.basicConfig(format='[%(funcName)s] - %(asctime)s - %(message)s', level=logging.INFO)
