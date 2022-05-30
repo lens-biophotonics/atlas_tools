@@ -23,6 +23,7 @@ def main():
     parser.add_argument('-s2xy', type=float, default=26.0, help="larger xy sigma")
     parser.add_argument('-s2z', type=float, default=14.0, help="larger z sigma")
     parser.add_argument('-t', type=float, default=310.0, help="absolute threshold")
+    parser.add_argument('-d', type=float, default=5.0, help="threshold distance")
     args = parser.parse_args()
 
     logger.info('initializing...')
