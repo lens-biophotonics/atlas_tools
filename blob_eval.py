@@ -41,12 +41,12 @@ def main():
         image = handle.whole()
         detected = blob_detector(image, args.s1xy, args.s1z, args.s2xy, args.s2z, args.t)
         true = np.genfromtxt(os.path.join(args.input, element + '.marker'), delimiter=',', skip_header=1)
-        if true.shape == 0:
+        if len(true) == 0:
             local_tp = 0
             local_fp = len(detected)
             local_fn = 0
         else:
-            if len(true.shape > 1):
+            if len(true.shape) > 1:
                 true = true[:, 0:3]
             else:
                 true = true[0:3]
