@@ -80,7 +80,7 @@ def main():
     pd_file = os.path.join(args.output, 'eval.csv')
     logger.info('writing results...')
     df.to_csv(pd_file, index=False)
-    sum_file = os.path.join(args.o, 'summary,csv')
+    sum_file = os.path.join(args.output, 'summary,csv')
     file = open(sum_file, "w")
     file.write("Number of subvolumes: %d\n" % (len(lista)))
     file.write("Total true positives: %d\n" % total_tp)
