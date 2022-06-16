@@ -28,7 +28,7 @@ def main():
 
     logger.info('initializing...')
     lista = os.listdir(args.input)
-    lista = [x for x in lista if 'tif' in x and 'marker' not in x]
+    lista = [x for x in lista if 'tif' in x and 'csv' not in x]
     tp = []
     fp = []
     fn = []
@@ -40,16 +40,16 @@ def main():
         handle = InputFile(os.path.join(args.input,element))
         image = handle.whole()
         detected = blob_detector(image, args.s1xy, args.s1z, args.s2xy, args.s2z, args.t)
-        true = np.genfromtxt(os.path.join(args.input, element + '.marker'), delimiter=',', skip_header=1)
+        true = np.genfromtxt(os.path.join(args.input, element + '.csv'), delimiter=',', skip_header=1)
         if len(true) == 0:
             local_tp = 0
             local_fp = len(detected)
             local_fn = 0
         else:
             if len(true.shape) > 1:
-                true = true[:, 0:3]
+                true = true[:, 5:8]
             else:
-                true = true[0:3]
+                true = true[5:8]
             ltp, lfp, lfn = compare_points(detected, true, args.d)
             local_tp = len(ltp)
             local_fp = len(lfp)
