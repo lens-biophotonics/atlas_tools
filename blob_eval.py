@@ -40,7 +40,8 @@ def main():
         handle = InputFile(os.path.join(args.input,element))
         image = handle.whole()
         detected = blob_detector(image, args.s1xy, args.s1z, args.s2xy, args.s2z, args.t)
-        true = np.genfromtxt(os.path.join(args.input, element + '.csv'), delimiter=',', skip_header=1)
+        name, ext = os.path.splitext(element)
+        true = np.genfromtxt(os.path.join(args.input, name + '.csv'), delimiter=',', skip_header=1)
         if len(true) == 0:
             local_tp = 0
             local_fp = len(detected)
