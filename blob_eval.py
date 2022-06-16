@@ -49,8 +49,10 @@ def main():
         else:
             if len(true.shape) > 1:
                 true = true[:, 5:8]
+                true[:, [0, 2]] = true[:, [2, 0]]
             else:
                 true = true[5:8]
+                true[0, 2] = true[2, 0]
             ltp, lfp, lfn = compare_points(detected, true, args.d)
             local_tp = len(ltp)
             local_fp = len(lfp)
@@ -81,7 +83,7 @@ def main():
     pd_file = os.path.join(args.output, 'eval.csv')
     logger.info('writing results...')
     df.to_csv(pd_file, index=False)
-    sum_file = os.path.join(args.output, 'summary,csv')
+    sum_file = os.path.join(args.output, 'summary.csv')
     file = open(sum_file, "w")
     file.write("Number of subvolumes: %d\n" % (len(lista)))
     file.write("Total true positives: %d\n" % total_tp)
