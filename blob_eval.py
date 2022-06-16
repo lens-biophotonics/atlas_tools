@@ -52,7 +52,7 @@ def main():
                 true[:, [0, 2]] = true[:, [2, 0]]
             else:
                 true = true[5:8]
-                true[0, 2] = true[2, 0]
+                true = np.flip(true)
             ltp, lfp, lfn = compare_points(detected, true, args.d)
             local_tp = len(ltp)
             local_fp = len(lfp)
