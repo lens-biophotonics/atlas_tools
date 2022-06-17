@@ -80,6 +80,8 @@ def main():
     df = pd.DataFrame(zip(lista, tp, fp, fn, prec, rec, f1), columns=['filename', 'true positives', 'false positives',
                                                                       'false negatives', 'precision', 'recall',
                                                                       'f1-score'])
+    if not os.path.exists(args.output):
+        os.makedirs(args.output, 0o775)
     pd_file = os.path.join(args.output, 'eval.csv')
     logger.info('writing results...')
     df.to_csv(pd_file, index=False)
