@@ -22,8 +22,8 @@ def main():
     parser.add_argument('-l', '--leftchannel', help="name of the left channel", default='561')
     args = parser.parse_args()
 
-    l = args.l
-    r = args.r
+    l = args.leftchannel
+    r = args.rightchannel
 
     base = args.basepath
     if base[-1] == '/':
@@ -31,12 +31,12 @@ def main():
     if not os.path.exists(base):
         os.makedirs(base, 0o775)
 
-    if args.s:
+    if args.singleside:
         side = ['dummy']
     else:
         side = ['_front', '_back']
 
-    if args.c:
+    if args.singlechannel:
         ch = [['dummy'], ['dummy']]
     else:
         ch = [[l, '_l'], [r, '_r']]
@@ -51,7 +51,7 @@ def main():
             s1 = base + '_' + s
 
 # 2nd iteration: source is duplicated in case of multiple illuminations
-        if args.i:
+        if args.singleillumination:
             ill = s1
         else:
             ill = [s1 + '_sx', s1 + '_dx']
