@@ -59,7 +59,7 @@ def main():
 # 3rd iteration: channels (561, 638, etc.). a2 is a1 for single channel datasets, and a1_channel for multichannel
         for i in ill:
             for c in ch:
-                if c == 'dummy':
+                if c[0] == 'dummy':
                     d2 = d1
                 else:
                     d2 = merge_and_create(d1, c[0])
