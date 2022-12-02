@@ -13,42 +13,62 @@ def main():
 
     parser = argparse.ArgumentParser()
     parser.add_argument('-b', '--basepath', help="base path", metavar='PATH')
+    parser.add_argument('-s', '--singleside', help="only one side present (no front + back)", action='store_true',
+                        default=False)
+    parser.add_argument('-i', '--singleillumination', help="only one illumination present (no left + right)",
+                        action='store_true', default=False)
+    parser.add_argument('-c', '--singlechannel', help="only one channel", action='store_true', default=False)
+    parser.add_argument('-r', '--rightchannel', help="name of the right channel", default='638')
+    parser.add_argument('-l', '--leftchannel', help="name of the left channel", default='561')
     args = parser.parse_args()
+
+    l = args.l
+    r = args.r
 
     base = args.basepath
     if base[-1] == '/':
         base = base[:-1]
-    fd = base + '_front_dx'
-    fs = base + '_front_sx'
-    bd = base + '_back_dx'
-    bs = base + '_back_sx'
-
     if not os.path.exists(base):
         os.makedirs(base, 0o775)
-    f = merge_and_create(base, 'front')
-    f5 = merge_and_create(f, '561')
-    f5d = merge_and_create(f5, 'ds')
-    f5z = merge_and_create(f5, 'zip')
-    f6 = merge_and_create(f, '638')
-    f6d = merge_and_create(f6, 'ds')
-    f6z = merge_and_create(f6, 'zip')
-    b = merge_and_create(base, 'back')
-    b5 = merge_and_create(b, '561')
-    b5d = merge_and_create(b5, 'ds')
-    b5z = merge_and_create(b5, 'zip')
-    b6 = merge_and_create(b, '638')
-    b6d = merge_and_create(b6, 'ds')
-    b6z = merge_and_create(b6, 'zip')
 
-    move_folders(bs, b5d, b5z, b6d, b6z)
-    move_folders(bd, b5d, b5z, b6d, b6z)
-    move_folders(fs, f5d, f5z, f6d, f6z)
-    move_folders(fd, f5d, f5z, f6d, f6z)
+    if args.s:
+        side = ['dummy']
+    else:
+        side = ['_front', '_back']
 
-    os.rmdir(bs)
-    os.rmdir(bd)
-    os.rmdir(fs)
-    os.rmdir(fd)
+    if args.c:
+        ch = [['dummy'], ['dummy']]
+    else:
+        ch = [[l, '_l'], [r, '_r']]
+
+# 1st iteration: sides (front, back). a1 is base when no double side is enabled, and base_front or base_back else
+    for s in side:
+        if s == 'dummy':
+            d1 = base
+            s1 = base
+        else:
+            d1 = merge_and_create(base, s)
+            s1 = base + '_' + s
+
+# 2nd iteration: source is duplicated in case of multiple illuminations
+        if args.i:
+            ill = s1
+        else:
+            ill = [s1 + '_sx', s1 + '_dx']
+
+# 3rd iteration: channels (561, 638, etc.). a2 is a1 for single channel datasets, and a1_channel for multichannel
+        for i in ill:
+            for c in ch:
+                if c == 'dummy':
+                    d2 = d1
+                else:
+                    d2 = merge_and_create(d1, c[0])
+
+                d2d = merge_and_create(d2, 'ds')
+                d2z = merge_and_create(d2, 'zip')
+
+                move_folder(i, d2d, d2z, c)
+            os.rmdir(i)
 
 
 def merge_and_create(base, des):
@@ -59,27 +79,30 @@ def merge_and_create(base, des):
     return full
 
 
-def move_folders(base, d5d, d5z, d6d, d6z):
+def move_folder(source, destd, destz, ch):
     import os
     from shutil import move
-    lista = os.listdir(base)
-    for file in lista:
-        if '_l' in file and 'tiff' in file:
-            source = os.path.join(base, file)
-            dest = os.path.join(d5d, file)
-            move(source, dest)
-        if '_l' in file and 'zip' in file:
-            source = os.path.join(base, file)
-            dest = os.path.join(d5z, file)
-            move(source, dest)
-        if '_r' in file and 'tiff' in file:
-            source = os.path.join(base, file)
-            dest = os.path.join(d6d, file)
-            move(source, dest)
-        if '_r' in file and 'zip' in file:
-            source = os.path.join(base, file)
-            dest = os.path.join(d6z, file)
-            move(source, dest)
+    lista = os.listdir(source)
+    if ch[1] == 'dummy':
+        for file in lista:
+            if 'tiff' in file:
+                start = os.path.join(source, file)
+                stop = os.path.join(destd, file)
+                move(start, stop)
+            if 'zip' in file:
+                start = os.path.join(source, file)
+                stop = os.path.join(destz, file)
+                move(start, stop)
+    else:
+        for file in lista:
+            if ch[1] in file and 'tiff' in file:
+                start = os.path.join(source, file)
+                stop = os.path.join(destd, file)
+                move(start, stop)
+            if ch[1] in file and 'zip' in file:
+                start = os.path.join(source, file)
+                stop = os.path.join(destz, file)
+                move(start, stop)
 
 
 if __name__ == "__main__":
