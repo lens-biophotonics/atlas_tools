@@ -37,7 +37,7 @@ def main():
         side = ['_front', '_back']
 
     if args.singlechannel:
-        ch = [['dummy'], ['dummy']]
+        ch = [['dummy', 'dummy'], ['dummy', 'dummy']]
     else:
         ch = [[l, '_l'], [r, '_r']]
 
