@@ -53,7 +53,7 @@ def main():
 
 # 2nd iteration: source is duplicated in case of multiple illuminations
         if args.singleillumination:
-            ill = s1
+            ill = [s1]
         else:
             ill = [s1 + '_sx', s1 + '_dx']
 
