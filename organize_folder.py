@@ -20,6 +20,7 @@ def main():
     parser.add_argument('-c', '--singlechannel', help="only one channel", action='store_true', default=False)
     parser.add_argument('-r', '--rightchannel', help="name of the right channel", default='638')
     parser.add_argument('-l', '--leftchannel', help="name of the left channel", default='561')
+    parser.add_argument('-d', '--debug', help="debug mode", action='store_true', default=False)
     args = parser.parse_args()
 
     l = args.leftchannel
@@ -67,8 +68,15 @@ def main():
                 d2d = merge_and_create(d2, 'ds')
                 d2z = merge_and_create(d2, 'zip')
 
-                move_folder(i, d2d, d2z, c)
-            os.rmdir(i)
+                if args.debug:
+                    print(i)
+                    print(d2d)
+                    print(d2z)
+                    print(c)
+                else:
+                    move_folder(i, d2d, d2z, c)
+            if not args.debug:
+                os.rmdir(i)
 
 
 def merge_and_create(base, des):
