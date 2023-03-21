@@ -9,6 +9,8 @@ def main():
     from skimage import measure
     from skimage.util import map_array
     import os
+    from skimage.filters import difference_of_gaussians as dog
+    import numpy as np
 
     logger = logging.getLogger(__name__)
     logging.basicConfig(format='[%(funcName)s] - %(asctime)s - %(message)s', level=logging.INFO)
@@ -27,7 +29,10 @@ def main():
     image = tiff.imread(args.input)
 
     logger.info('processing image...')
-    blob = (image > args.threshold).astype('uint8')
+    filt = np.zeros(image.shape)
+    for n in np.arange(image.shape[0]):
+        filt[n, ...] = dog(image[n, ...], low_sigma=5, high_sigma=20)
+    blob = ((filt * image) > args.threshold).astype('uint8')
     labels = measure.label(blob, background=0)
     reg = measure.regionprops_table(labels, properties=('label','area',))
     condition = (reg['area'] > args.vmin) & (reg['area'] < args.vmax)
