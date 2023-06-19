@@ -6,8 +6,9 @@ def main():
     import coloredlogs
     import argparse
     import tifffile as tiff
-    from scipy.ndimage import gaussian_filter1d
     import numpy as np
+    from skimage.morphology import skeletonize
+    from skimage.filters import gaussian
 
     logger = logging.getLogger(__name__)
     logging.basicConfig(format='[%(funcName)s] - %(asctime)s - %(message)s', level=logging.INFO)
@@ -33,10 +34,24 @@ def main():
     sigmaz = np.arange(args.sigmazmin, args.sigmazmax, args.sigmazstep)
     sigmas = np.stack((sigmaz, sigmaxy, sigmaxy), axis=1)
 
+    temp = vesselness(data, sigmas)
+
+    temp = gaussian(temp, sigma=2)
+    temp = temp**0.5
+    perc = np.percentile(temp, 80)
+    temp = (temp>perc).astype('float')
+
+    sk = skeletonize(temp)
+
+    tiff.imwrite(args.output, (sk*255).astype('uint8'))
+
+
+def vesselness(data, sigmas):
+    from scipy.ndimage import gaussian_filter1d
+    import numpy as np
     i = 1
 
     for row in sigmas:
-        logger.info('performing vesselness analysis with sigma %d of %d', i, len(sigmaz))
         h11 = gaussian_filter1d(data, row[0], axis=0, order=2)
         h22 = gaussian_filter1d(data, row[1], axis=1, order=2)
         h33 = gaussian_filter1d(data, row[2], axis=2, order=2)
@@ -48,30 +63,29 @@ def main():
 
         eigv1, eigv2, eigv3 = eigenvalues(h11, h22, h33, h12, h13, h23)
         with np.errstate(divide='ignore', invalid='ignore'):
-            Ra = np.abs(eigv2) / np.abs(eigv3)
-            Rb = np.abs(eigv1) / np.sqrt(np.abs(eigv2 * eigv3))
-            S = np.sqrt(eigv1 ** 2 + eigv2 ** 2 + eigv3 ** 2)
-        Ra = np.nan_to_num(Ra)
-        Rb = np.nan_to_num(Rb)
-        S = np.nan_to_num(S)
+            ra = np.abs(eigv2) / np.abs(eigv3)
+            rb = np.abs(eigv1) / np.sqrt(np.abs(eigv2 * eigv3))
+            s = np.sqrt(eigv1 ** 2 + eigv2 ** 2 + eigv3 ** 2)
+        ra = np.nan_to_num(ra)
+        rb = np.nan_to_num(rb)
+        s = np.nan_to_num(s)
 
         alfa = 0.5
         beta = 0.5
-        c = 0.5 * np.max(S)
+        c = 0.5 * np.max(s)
 
         temp = np.where(np.logical_or((eigv2 > 0), (eigv3 > 0)), 0,
-                     (1 - np.exp(-(Ra ** 2) / (2 * alfa ** 2))) * np.exp(-(Rb ** 2) / (2 * beta ** 2)) * (
-                                 1 - np.exp(-(S ** 2) / (2 * c ** 2))))
+                     (1 - np.exp(-(ra ** 2) / (2 * alfa ** 2))) * np.exp(-(rb ** 2) / (2 * beta ** 2)) * (
+                                 1 - np.exp(-(s ** 2) / (2 * c ** 2))))
 
         if i == 1:
-            V = temp
+            v = temp
         else:
-            V = np.maximum(V, temp)
+            v = np.maximum(v, temp)
 
         i += 1
 
-    logger.info('saving vesselness image...')
-    tiff.imwrite(args.output, (V*255).astype('uint8'))
+    return(v)
 
 
 def eigenvalues(a11, a22, a33, a12, a13, a23):
@@ -102,7 +116,3 @@ def eigenvalues(a11, a22, a33, a12, a13, a23):
     eig1, eig2 = np.where(np.abs(eig1) < np.abs(eig2), eig1, eig2), np.where(np.abs(eig1) < np.abs(eig2), eig2, eig1)
 
     return eig1, eig2, eig3
-
-
-if __name__ == "__main__":
-    main()
