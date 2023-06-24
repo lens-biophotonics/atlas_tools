@@ -61,7 +61,7 @@ def vesselness(data, sigmas):
     i = 1
 
     for row in sigmas:
-        logger.info('computing filtering with sigma #%d of %d', row, len(sigmas))
+        logger.info('computing filtering with sigma #%d of %d', i, len(sigmas))
         h11 = gaussian_filter1d(data, row[0], axis=0, order=2)
         h22 = gaussian_filter1d(data, row[1], axis=1, order=2)
         h33 = gaussian_filter1d(data, row[2], axis=2, order=2)
