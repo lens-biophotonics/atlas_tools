@@ -116,3 +116,7 @@ def eigenvalues(a11, a22, a33, a12, a13, a23):
     eig1, eig2 = np.where(np.abs(eig1) < np.abs(eig2), eig1, eig2), np.where(np.abs(eig1) < np.abs(eig2), eig2, eig1)
 
     return eig1, eig2, eig3
+
+
+if __name__ == "__main__":
+    main()
