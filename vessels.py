@@ -49,7 +49,7 @@ def main():
         sk = skeletonize(temp)
         tiff.imwrite(args.output, (sk * 255).astype('uint8'))
     else:
-        tiff.imwrite(args.output, temp.astype('uint8'))
+        tiff.imwrite(args.output, (temp * 255).astype('uint8'))
 
 
 def vesselness(data, sigmas):
