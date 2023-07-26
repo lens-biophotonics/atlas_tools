@@ -35,14 +35,17 @@ def main():
     sigmaz = np.arange(args.sigmazmin, args.sigmazmax, args.sigmazstep)
     sigmas = np.stack((sigmaz, sigmaxy, sigmaxy), axis=1)
 
+    logger.info('computing vesselness...')
     temp = vesselness(data, sigmas)
 
+    logger.info('smoothing and thresholding vesselness image...')
     temp = gaussian(temp, sigma=2)
     temp = temp**0.5
     perc = np.percentile(temp, 80)
     temp = (temp>perc).astype('float')
 
     if args.skeleton:
+        logger.info('skeletonizing image...')
         sk = skeletonize(temp)
         tiff.imwrite(args.output, (sk * 255).astype('uint8'))
     else:
@@ -52,9 +55,16 @@ def main():
 def vesselness(data, sigmas):
     from scipy.ndimage import gaussian_filter1d
     import numpy as np
+    import logging
+    import coloredlogs
+
+    logger = logging.getLogger(__name__)
+    logging.basicConfig(format='[%(funcName)s] - %(asctime)s - %(message)s', level=logging.INFO)
+    coloredlogs.install(level='DEBUG', logger=logger)
     i = 1
 
     for row in sigmas:
+        logger.info('computing filtering with sigma #%d of %d', i, len(sigmas))
         h11 = gaussian_filter1d(data, row[0], axis=0, order=2)
         h22 = gaussian_filter1d(data, row[1], axis=1, order=2)
         h33 = gaussian_filter1d(data, row[2], axis=2, order=2)
