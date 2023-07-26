@@ -23,6 +23,7 @@ def main():
     parser.add_argument('-szmax', '--sigmazmax', help="maximum sigma in z", type=float, default=4.51)
     parser.add_argument('-sxys', '--sigmaxystep', help="sigma step in xy", type=float, default=4)
     parser.add_argument('-szs', '--sigmazstep', help="sigma step in z", type=float, default=1)
+    parser.add_argument('-s', '--skeleton', help='extract skeleton',  action='store_true', default=False)
 
     args = parser.parse_args()
 
@@ -41,9 +42,11 @@ def main():
     perc = np.percentile(temp, 80)
     temp = (temp>perc).astype('float')
 
-    sk = skeletonize(temp)
-
-    tiff.imwrite(args.output, (sk*255).astype('uint8'))
+    if args.skeleton:
+        sk = skeletonize(temp)
+        tiff.imwrite(args.output, (sk * 255).astype('uint8'))
+    else:
+        tiff.imwrite(args.output, temp.astype('uint8'))
 
 
 def vesselness(data, sigmas):
@@ -116,3 +119,7 @@ def eigenvalues(a11, a22, a33, a12, a13, a23):
     eig1, eig2 = np.where(np.abs(eig1) < np.abs(eig2), eig1, eig2), np.where(np.abs(eig1) < np.abs(eig2), eig2, eig1)
 
     return eig1, eig2, eig3
+
+
+if __name__ == "__main__":
+    main()
