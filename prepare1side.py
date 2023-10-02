@@ -15,8 +15,8 @@ def main():
     coloredlogs.install(level='DEBUG', logger=logger)
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('-y', '--yellow', help='yellow image path', metavar='PATH')
-    parser.add_argument('-r', '--red', help='red image path', metavar='PATH')
+    parser.add_argument('-y', '--yellow', help='yellow (main) image path', metavar='PATH')
+    parser.add_argument('-r', '--red', help='red (optional mask) image path', metavar='PATH')
     parser.add_argument('-o', '--output', help="output base path", metavar='PATH')
     parser.add_argument('-x-final', type=float, default=0.025, help="final voxel size along x (in mm)")
     parser.add_argument('-y-final', type=float, default=0.025, help="final voxel size along y (in mm)")
@@ -33,11 +33,12 @@ def main():
     parser.add_argument('-f', '--flip', help="vertically flip image", action='store_true', default=False)
     args = parser.parse_args()
 
-    logger.info('extracting mask from red image...')
-    red = InputFile(args.red)
-    rimage = red.whole()
-    rimage = gaussian_filter(rimage, args.sigma)
-    rimage = (rimage > args.noiselevel)
+    if args.red is not None:
+        logger.info('extracting mask from red image...')
+        red = InputFile(args.red)
+        rimage = red.whole()
+        rimage = gaussian_filter(rimage, args.sigma)
+        rimage = (rimage > args.noiselevel)
 
     logger.info('processing yellow image...')
     # check if output folder exists
@@ -48,10 +49,18 @@ def main():
     path = os.path.join(args.output, name + ".nii.gz")
     path_nogamma = os.path.join(args.output, name + "_nogamma.nii.gz")
 
-    convertImage(args.yellow, out_path=path, x_final=args.x_final, y_final=args.y_final, z_final=args.z_final,
+    if args.red is None:
+        convertImage(args.yellow, out_path=path, x_final=args.x_final, y_final=args.y_final, z_final=args.z_final,
                  x_pix=args.x_pix, y_pix=args.y_pix, z_pix=args.z_pix, nl=args.noiselevel, gamma=args.gamma,
-                 mp=args.max_percentile, flip=args.flip, mask=rimage)
-    convertImage(args.yellow, out_path=path_nogamma, x_final=args.x_final, y_final=args.y_final,
+                 mp=args.max_percentile, flip=args.flip)
+        convertImage(args.yellow, out_path=path_nogamma, x_final=args.x_final, y_final=args.y_final,
+                 z_final=args.z_final, x_pix=args.x_pix, y_pix=args.y_pix, z_pix=args.z_pix,
+                 nl=args.noiselevel, gamma=1, mp=args.max_percentile, flip=args.flip)
+    else:
+        convertImage(args.yellow, out_path=path, x_final=args.x_final, y_final=args.y_final, z_final=args.z_final,
+                     x_pix=args.x_pix, y_pix=args.y_pix, z_pix=args.z_pix, nl=args.noiselevel, gamma=args.gamma,
+                     mp=args.max_percentile, flip=args.flip, mask=rimage)
+        convertImage(args.yellow, out_path=path_nogamma, x_final=args.x_final, y_final=args.y_final,
                  z_final=args.z_final, x_pix=args.x_pix, y_pix=args.y_pix, z_pix=args.z_pix,
                  nl=args.noiselevel, gamma=1, mp=args.max_percentile, flip=args.flip, mask=rimage)
 
