@@ -32,7 +32,8 @@ def main():
             handle = InputFile(green_path)
             green = handle.whole()
             if args.zip:
-                green = rescale(green, scale, channel_axis=None, anti_aliasing=False, preserve_range=True)
+                green = rescale(green, scale, channel_axis=None, anti_aliasing=False,
+                                preserve_range=True).astype('uint16')
             logger.info('opened GREEN image %s', green_path)
             token = name[0:17]
             red_name = next((name2 for name2 in red_dir if token in name2), None)
@@ -40,7 +41,8 @@ def main():
             handle = InputFile(red_path)
             red = handle.whole()
             if args.zip:
-                red = rescale(red, scale, channel_axis=None, anti_aliasing=False, preserve_range=True)
+                red = rescale(red, scale, channel_axis=None, anti_aliasing=False,
+                              preserve_range=True).astype('uint16')
             logger.info('opened RED image %s', red_path)
             shape = green.shape
             merge = np.zeros((shape[0], 2, shape[1], shape[2])).astype(green.dtype)
