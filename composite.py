@@ -48,6 +48,9 @@ def main():
             merge = np.zeros((shape[0], 2, shape[1], shape[2])).astype(green.dtype)
             merge[:, 0, ...] = red
             merge[:, 1, ...] = green
+            if args.zip:
+                root, ext = os.path.splitext(name)
+                name = root + '.tiff'
             merge_path = os.path.join(args.output, name)
             tifffile.imwrite(merge_path, merge, imagej=True, photometric=True, metadata={'mode':'composite'},
                              compression='zlib')
