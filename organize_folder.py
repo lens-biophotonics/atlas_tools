@@ -42,6 +42,8 @@ def main():
     else:
         ch = [[l, '_l'], [r, '_r']]
 
+    counter = 1
+
 # 1st iteration: sides (front, back). a1 is base when no double side is enabled, and base_front or base_back else
     for s in side:
         if s == 'dummy':
@@ -50,12 +52,14 @@ def main():
         else:
             d1 = merge_and_create(base, s)
             s1 = base + '_' + s
+            counter += 1
 
 # 2nd iteration: source is duplicated in case of multiple illuminations
         if args.singleillumination:
             ill = [s1]
         else:
             ill = [s1 + '_sx', s1 + '_dx']
+            counter += 1
 
 # 3rd iteration: channels (561, 638, etc.). a2 is a1 for single channel datasets, and a1_channel for multichannel
         for i in ill:
@@ -64,6 +68,7 @@ def main():
                     d2 = d1
                 else:
                     d2 = merge_and_create(d1, c[0])
+                    counter += 1
 
                 d2d = merge_and_create(d2, 'ds')
                 d2z = merge_and_create(d2, 'zip')
@@ -75,7 +80,7 @@ def main():
                     print(c)
                 else:
                     move_folder(i, d2d, d2z, c)
-            if not args.debug:
+            if not args.debug and counter != 1:
                 os.rmdir(i)
 
 
