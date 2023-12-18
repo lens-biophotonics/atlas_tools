@@ -98,21 +98,21 @@ def move_folder(source, destd, destz, ch):
     lista = os.listdir(source)
     if ch[1] == 'dummy':
         for file in lista:
-            if 'tiff' in file:
+            if '.tiff' in file:
                 start = os.path.join(source, file)
                 stop = os.path.join(destd, file)
                 move(start, stop)
-            if 'zip' in file:
+            if '.zip' in file:
                 start = os.path.join(source, file)
                 stop = os.path.join(destz, file)
                 move(start, stop)
     else:
         for file in lista:
-            if ch[1] in file and 'tiff' in file:
+            if ch[1] in file and '.tiff' in file:
                 start = os.path.join(source, file)
                 stop = os.path.join(destd, file)
                 move(start, stop)
-            if ch[1] in file and 'zip' in file:
+            if ch[1] in file and '.zip' in file:
                 start = os.path.join(source, file)
                 stop = os.path.join(destz, file)
                 move(start, stop)
