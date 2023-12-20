@@ -68,7 +68,6 @@ def main():
                     d2 = d1
                 else:
                     d2 = merge_and_create(d1, c[0])
-                    counter += 1
 
                 d2d = merge_and_create(d2, 'ds')
                 d2z = merge_and_create(d2, 'zip')
