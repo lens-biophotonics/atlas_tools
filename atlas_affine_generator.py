@@ -55,7 +55,7 @@ def main():
 
     scalevec = i_eigval/r_eigval
     scale = np.sqrt(scalevec.mean())
-    sign = 1 if args.flip else -1
+    sign = -1 if args.flip else 1
 
     sinus = i_eigvec[0, 1] * np.sign(i_eigvec[0, 0]) * sign
     cosinus = np.abs(i_eigvec[0, 0]) * sign
