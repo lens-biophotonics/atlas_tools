@@ -16,6 +16,7 @@ def main():
     parser.add_argument('-i', '--image', help="image to be registered", metavar='PATH')
     parser.add_argument('-r', '--reference', help="reference atlas image", metavar='PATH')
     parser.add_argument('-o', '--output', help="output file", metavar='PATH')
+    parser.add_argument('-f', '--flip', help='flip vertically', action='store_true', default=False)
     args = parser.parse_args()
 
     image = nib.load(args.image)
@@ -54,9 +55,10 @@ def main():
 
     scalevec = i_eigval/r_eigval
     scale = np.sqrt(scalevec.mean())
+    sign = -1 if args.flip else 1
 
-    sinus = i_eigvec[0, 1] * np.sign(i_eigvec[0, 0])
-    cosinus = np.abs(i_eigvec[0, 0])
+    sinus = i_eigvec[0, 1] * np.sign(i_eigvec[0, 0]) * sign
+    cosinus = np.abs(i_eigvec[0, 0]) * sign
 
     a11 = scale * cosinus
     a12 = scale * sinus
