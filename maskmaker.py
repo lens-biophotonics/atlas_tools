@@ -23,7 +23,7 @@ def main():
     logger.info('opening %s...', args.input)
     handle = InputFile(args.input)
     in_image = handle.whole()
-    out_image = ((in_image > args.threshold))
+    out_image = (in_image > args.threshold)
     out_image = opening(out_image, iterations=2)
     logger.info('writing result to %s...', args.output)
     tiff.imwrite(args.output, (out_image*255).astype('uint8'), compression='zlib')
