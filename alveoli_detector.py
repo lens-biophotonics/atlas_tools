@@ -9,6 +9,7 @@ def main():
     import argparse
     import tifffile as tiff
     from zetastitcher import VirtualFusedVolume
+    from skimage.transform import rescale
 
     logger = logging.getLogger(__name__)
     logging.basicConfig(format='[%(funcName)s] - %(asctime)s - %(message)s', level=logging.INFO)
@@ -21,50 +22,66 @@ def main():
                         default=320)
     parser.add_argument('-xy', '--xyscale', help="xy scaling from full-res to analysis-res", type=float,
                         default=8)
-    parser.add_argument('-xy', '--zscale', help="z scaling from full-res to analysis-res", type=float,
+    parser.add_argument('-z', '--zscale', help="z scaling from full-res to analysis-res", type=float,
                         default=2.5)
-    parser.add_argument('-r', '--rightchannel', help="name of the right channel", default='638')
-    parser.add_argument('-l', '--leftchannel', help="name of the left channel", default='561')
-    parser.add_argument('-d', '--debug', help="debug mode", action='store_true', default=False)
     args = parser.parse_args()
 
+    logger.info('reading downscaled image...')
+
     ds = tiff.imread(args.downscaled)
-    thr = 150   # threshold
-    msc = 2   # scale from downscale to mask
+    thr = 150  # threshold
+    msc = 2  # scale from downscale to mask
     dscxy = 16  # xy scale from full-res to downscale
-    dscz = 5    # z scale from full-res to downscale
+    dscz = 5  # z scale from full-res to downscale
     ms = mask(ds, thr, msc)
 
-    xstep = (args.blocksize * args.xyscale) / (msc * dscxy)
-    ystep = (args.blocksize * args.xyscale) / (msc * dscxy)
-    zstep = (args.blocksize * args.zscale) / (msc * dscz)
+    xred = args.xyscale / (msc * dscxy)
+    yred = args.xyscale / (msc * dscxy)
+    zred = args.zscale / (msc * dscz)
+
+    xstep = args.blocksize * xred
+    ystep = args.blocksize * yred
+    zstep = args.blocksize * zred
 
     vfv = VirtualFusedVolume(args.volume)
     volume = []
     surface = []
+    scale_tup = tuple(args.zscale, args.xyscale, args.xyscale)
+    out_shape = tuple(int(l / r) for l, r in zip(vfv.shape, scale_tup))
+    out_mask = np.zeros(out_shape).astype('uint8')
 
-    for x in np.arange(0, ms.shape[2], xstep):
-        for y in np.arange(0, ms.shape[1], ystep):
-            for z in np.arange(0, ms.shape[0], zstep):
-                if np.any(ms[z:(z + zstep), y:(y + ystep), x:(x + xstep)]):
-                    block = vfv[(z*args.zscale):((z*args.zscale) + args.blocksize),
-                            (y*args.yscale):((y*args.yscale) + args.blocksize),
-                            (x*args.xscale):((x*args.xscale) + args.blocksize)]
-                    alveomask = segment(block, 180)
+    n = 1
+    n_blocks = int((out_shape[2] * out_shape[1] * out_shape[0]) / (args.blocksize**3))
+
+    for x in np.arange(0, out_shape[2], args.blocksize):
+        xr = int(x / xred)
+        for y in np.arange(0, out_shape[1], args.blocksize):
+            yr = int(y / yred)
+            for z in np.arange(0, out_shape[0], args.blocksize):
+                zr = int(z / zred)
+                logger.info('processing block %d of %d', n, n_blocks)
+                n += 1
+                if np.any(ms[zr:(zr + zstep), yr:(yr + ystep), xr:(xr + xstep)]):
+                    block = vfv[(z * args.zscale):((z + args.blocksize) * args.zscale),
+                                (y * args.yscale):((y + args.blocksize) * args.xyscale),
+                                (x * args.xscale):((x + args.blocksize) * args.xyscale)]
+                    block_ds = rescale(block, (1 / args.zscale, 1 / args.xyscale, 1 / args.xyscale))
+                    alveomask = segment(block_ds, 180)
                     vol, surf = morpho(alveomask)
                     volume.append(vol)
                     surface.append(surf)
-
+                    out_mask[z:(z + args.blocksize), y:(y + args.blocksize), x:(x + args.blocksize)] = (
+                        alveomask.astype('uint8'))
 
 
 def mask(image, threshold, scale):
     from skimage.transform import rescale
     from skimage.morphology import binary_opening, binary_closing, ball
-    im2 = rescale(image, 1/scale, preserve_range=True)
-    im3 = im2>threshold
+    im2 = rescale(image, 1 / scale, preserve_range=True)
+    im3 = im2 > threshold
     im3 = binary_closing(im3, ball(5))
     im3 = binary_opening(im3, ball(3))
-    return(im3)
+    return im3
 
 
 def segment(image, threshold):
@@ -75,7 +92,7 @@ def segment(image, threshold):
     from skimage.segmentation import watershed
     from skimage.measure import label
 
-    im = image<threshold
+    im = image < threshold
 
     # remove holes from binary data and extract pixel-wise skeleton
     ims = remove_small_holes(binary_opening(im, ball(3)), area_threshold=100000)
@@ -135,7 +152,7 @@ def segment(image, threshold):
 
     # cleanup watershed, preserving only alveoli
     wtlab = np.copy(wt)
-    wtlab[np.where(np.logical_and(wtlab < j2ef.shape[0], wtlab>0))] = 1
+    wtlab[np.where(np.logical_and(wtlab < j2ef.shape[0], wtlab > 0))] = 1
     wtlab[np.where(wtlab >= j2ef.shape[0])] = 0
     labels = label(wtlab)
     for n in range(labels.max()):
@@ -165,3 +182,7 @@ def morpho(alveomask):
         surf.append(v - u)
 
     return vol, surf
+
+
+if __name__ == "__main__":
+    main()
