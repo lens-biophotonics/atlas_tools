@@ -2,6 +2,7 @@
 
 
 def main():
+    global alveomask
     import numpy as np
     import os
     import logging
@@ -24,6 +25,7 @@ def main():
                         default=8)
     parser.add_argument('-z', '--zscale', help="z scaling from full-res to analysis-res", type=float,
                         default=2.5)
+    parser.add_argument('-o', '--outpath', help="output base path", metavar='PATH')
     args = parser.parse_args()
 
     logger.info('reading downscaled image...')
@@ -44,9 +46,8 @@ def main():
     zstep = args.blocksize * zred
 
     vfv = VirtualFusedVolume(args.volume)
-    volume = []
-    surface = []
-    scale_tup = tuple(args.zscale, args.xyscale, args.xyscale)
+    alveoli = []
+    scale_tup = tuple((args.zscale, args.xyscale, args.xyscale))
     out_shape = tuple(int(l / r) for l, r in zip(vfv.shape, scale_tup))
     out_mask = np.zeros(out_shape).astype('uint8')
 
@@ -68,10 +69,12 @@ def main():
                     block_ds = rescale(block, (1 / args.zscale, 1 / args.xyscale, 1 / args.xyscale))
                     alveomask = segment(block_ds, 180)
                     vol, surf = morpho(alveomask)
-                    volume.append(vol)
-                    surface.append(surf)
+                    alveoli.append((vol, surf))
                     out_mask[z:(z + args.blocksize), y:(y + args.blocksize), x:(x + args.blocksize)] = (
                         alveomask.astype('uint8'))
+
+    tiff.imwrite(os.path.join(args.outpath, '.tiff'), out_mask)
+    np.savetxt(os.path.join(args.outpath, '.csv'), alveoli, delimiter=',', fmt='%d')
 
 
 def mask(image, threshold, scale):
@@ -131,7 +134,7 @@ def segment(image, threshold):
     j2ef = j2e[j2e['branch-distance'] > 15]
 
     # create skeleton image with different color for each branch
-    markers = np.zeros(sk2s.shape)
+    markers = np.zeros(sk.shape)
     n = 0
     m = j2ef.shape[0]
     for index, element in branch_data.iterrows():
