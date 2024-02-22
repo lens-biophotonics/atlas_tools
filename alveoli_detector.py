@@ -2,7 +2,6 @@
 
 
 def main():
-    global alveomask
     import numpy as np
     import os
     import logging
