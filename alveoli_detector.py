@@ -54,12 +54,11 @@ def main():
     n_blocks = int((out_shape[2] * out_shape[1] * out_shape[0]) / (args.blocksize**3))
 
     for x in np.arange(0, out_shape[2], args.blocksize):
-        xr = int(x / xred)
+        xr = int(x * xred)
         for y in np.arange(0, out_shape[1], args.blocksize):
-            yr = int(y / yred)
+            yr = int(y * yred)
             for z in np.arange(0, out_shape[0], args.blocksize):
-                zr = int(z / zred)
-                print(xr, yr, zr, xstep, ystep, zstep)
+                zr = int(z * zred)
                 if np.any(ms[zr:(zr + zstep), yr:(yr + ystep), xr:(xr + xstep)]):
                     logger.info('processing block %d of %d', n, n_blocks)
                     for zeta in np.arange(0, args.blocksize, 10):
@@ -182,9 +181,11 @@ def morpho(alveomask):
     labels = label(alveomask)
     for n in np.arange(labels.max()):
         temp = labels == n
-        u = temp.sum()
+        tempo = temp.astype('float')
+        u = tempo.sum()
         temp2 = binary_dilation(temp)
-        v = temp2.sum()
+        tempo2 = temp2.astype('float')
+        v = tempo2.sum()
         vol.append(u)
         surf.append(v - u)
 
