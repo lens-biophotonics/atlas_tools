@@ -3,7 +3,6 @@
 
 def main():
     import numpy as np
-    import os
     import logging
     import coloredlogs
     import argparse
@@ -13,13 +12,13 @@ def main():
 
     logger = logging.getLogger(__name__)
     logging.basicConfig(format='[%(funcName)s] - %(asctime)s - %(message)s', level=logging.INFO)
-    coloredlogs.install(level='DEBUG', logger=logger)
+    coloredlogs.install(level='INFO', logger=logger)
 
     parser = argparse.ArgumentParser()
     parser.add_argument('-v', '--volume', help="vfv yml path", metavar='PATH')
     parser.add_argument('-ds', '--downscaled', help="downscaled image file", metavar='PATH')
     parser.add_argument('-b', '--blocksize', help="size of blocks at desired resolution", type=int,
-                        default=320)
+                        default=300)
     parser.add_argument('-xy', '--xyscale', help="xy scaling from full-res to analysis-res", type=float,
                         default=8)
     parser.add_argument('-z', '--zscale', help="z scaling from full-res to analysis-res", type=float,
@@ -40,15 +39,16 @@ def main():
     yred = args.xyscale / (msc * dscxy)
     zred = args.zscale / (msc * dscz)
 
-    xstep = args.blocksize * xred
-    ystep = args.blocksize * yred
-    zstep = args.blocksize * zred
+    xstep = int(args.blocksize * xred)
+    ystep = int(args.blocksize * yred)
+    zstep = int(args.blocksize * zred)
 
     vfv = VirtualFusedVolume(args.volume)
     alveoli = []
     scale_tup = tuple((args.zscale, args.xyscale, args.xyscale))
     out_shape = tuple(int(l / r) for l, r in zip(vfv.shape, scale_tup))
     out_mask = np.zeros(out_shape).astype('uint8')
+    block_ds = np.zeros((args.blocksize, args.blocksize, args.blocksize)).astype('uint16')
 
     n = 1
     n_blocks = int((out_shape[2] * out_shape[1] * out_shape[0]) / (args.blocksize**3))
@@ -59,21 +59,26 @@ def main():
             yr = int(y / yred)
             for z in np.arange(0, out_shape[0], args.blocksize):
                 zr = int(z / zred)
-                logger.info('processing block %d of %d', n, n_blocks)
-                n += 1
+                print(xr, yr, zr, xstep, ystep, zstep)
                 if np.any(ms[zr:(zr + zstep), yr:(yr + ystep), xr:(xr + xstep)]):
-                    block = vfv[(z * args.zscale):((z + args.blocksize) * args.zscale),
-                                (y * args.yscale):((y + args.blocksize) * args.xyscale),
-                                (x * args.xscale):((x + args.blocksize) * args.xyscale)]
-                    block_ds = rescale(block, (1 / args.zscale, 1 / args.xyscale, 1 / args.xyscale))
+                    logger.info('processing block %d of %d', n, n_blocks)
+                    for zeta in np.arange(0, args.blocksize, 10):
+                        logger.info('reading zeta %d', zeta)
+                        block = vfv[int((z + zeta) * args.zscale):int((z + zeta + 10) * args.zscale),
+                                    int(y * args.xyscale):int((y + args.blocksize) * args.xyscale),
+                                    int(x * args.xyscale):int((x + args.blocksize) * args.xyscale)]
+                        block_ds[(z + zeta):(z + zeta+10),...] = rescale(block,(1 / args.zscale,
+                                                                                1 / args.xyscale, 1 / args.xyscale),
+                                                                         preserve_range=True)
                     alveomask = segment(block_ds, 180)
                     vol, surf = morpho(alveomask)
                     alveoli.append((vol, surf))
                     out_mask[z:(z + args.blocksize), y:(y + args.blocksize), x:(x + args.blocksize)] = (
                         alveomask.astype('uint8'))
+                n += 1
 
-    tiff.imwrite(os.path.join(args.outpath, '.tiff'), out_mask)
-    np.savetxt(os.path.join(args.outpath, '.csv'), alveoli, delimiter=',', fmt='%d')
+    tiff.imwrite(args.outpath + '.tiff', out_mask)
+    np.savetxt(args.outpath + '.csv', alveoli, delimiter=',', fmt='%d')
 
 
 def mask(image, threshold, scale):
