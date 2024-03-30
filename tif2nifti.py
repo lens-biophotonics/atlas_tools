@@ -17,6 +17,7 @@ def main():
     parser.add_argument('-x-pix', type=float, default=0.025, help="initial voxel size along x (in mm)")
     parser.add_argument('-y-pix', type=float, default=0.025, help="initial voxel size along y (in mm)")
     parser.add_argument('-z-pix', type=float, default=0.025, help="initial voxel size along z (in mm)")
+    parser.add_argument('-t', '--type', default='uint8', help="data type")
     args = parser.parse_args()
 
     tif2nii(args.input, args.output, args.x_pix, args.y_pix, args.z_pix)

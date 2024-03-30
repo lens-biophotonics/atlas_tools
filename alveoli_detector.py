@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import os.path
 
 
 def main():
@@ -11,7 +12,9 @@ def main():
     from skimage.transform import rescale
 
     logger = logging.getLogger(__name__)
+    vfv_logger = logging.getLogger("{0}.{1}")
     logging.basicConfig(format='[%(funcName)s] - %(asctime)s - %(message)s', level=logging.INFO)
+    vfv_logger.setLevel(logging.ERROR)
     coloredlogs.install(level='INFO', logger=logger)
 
     parser = argparse.ArgumentParser()
@@ -44,40 +47,57 @@ def main():
     zstep = int(args.blocksize * zred)
 
     vfv = VirtualFusedVolume(args.volume)
-    alveoli = []
+    xm = vfv.shape[2]
+    ym = vfv.shape[1]
+    zm = vfv.shape[0]
+    vols = []
+    surfs = []
     scale_tup = tuple((args.zscale, args.xyscale, args.xyscale))
     out_shape = tuple(int(l / r) for l, r in zip(vfv.shape, scale_tup))
     out_mask = np.zeros(out_shape).astype('uint8')
-    block_ds = np.zeros((args.blocksize, args.blocksize, args.blocksize)).astype('uint16')
 
     n = 1
-    n_blocks = int((out_shape[2] * out_shape[1] * out_shape[0]) / (args.blocksize**3))
+    n_blocks = (int(out_shape[2] / args.blocksize) + 1) * (int(out_shape[1] / args.blocksize) +
+                                                           1) * (int(out_shape[0] / args.blocksize) + 1)
 
     for x in np.arange(0, out_shape[2], args.blocksize):
         xr = int(x * xred)
+        xv1 = int(x * args.xyscale)
+        xv2 = int(np.clip((x + args.blocksize) * args.xyscale, 0, xm))
         for y in np.arange(0, out_shape[1], args.blocksize):
             yr = int(y * yred)
+            yv1 = int(y * args.xyscale)
+            yv2 = int(np.clip((y + args.blocksize) * args.xyscale, 0, ym))
             for z in np.arange(0, out_shape[0], args.blocksize):
                 zr = int(z * zred)
                 if np.any(ms[zr:(zr + zstep), yr:(yr + ystep), xr:(xr + xstep)]):
                     logger.info('processing block %d of %d', n, n_blocks)
+                    zmin = int(z * args.zscale)
+                    zmax = int(np.clip((z + args.blocksize) * args.zscale, 0, zm))
+                    block_ds = np.zeros((int((zmax - zmin) / args.zscale), int((yv2 - yv1) / args.xyscale),
+                                         int((xv2 - xv1) / args.xyscale))).astype('uint16')
                     for zeta in np.arange(0, args.blocksize, 10):
-                        logger.info('reading zeta %d', zeta)
-                        block = vfv[int((z + zeta) * args.zscale):int((z + zeta + 10) * args.zscale),
-                                    int(y * args.xyscale):int((y + args.blocksize) * args.xyscale),
-                                    int(x * args.xyscale):int((x + args.blocksize) * args.xyscale)]
-                        block_ds[(z + zeta):(z + zeta+10),...] = rescale(block,(1 / args.zscale,
-                                                                                1 / args.xyscale, 1 / args.xyscale),
-                                                                         preserve_range=True)
-                    alveomask = segment(block_ds, 180)
-                    vol, surf = morpho(alveomask)
-                    alveoli.append((vol, surf))
-                    out_mask[z:(z + args.blocksize), y:(y + args.blocksize), x:(x + args.blocksize)] = (
-                        alveomask.astype('uint8'))
+                        zv1 = int((z + zeta) * args.zscale)
+                        zv2 = int(np.clip((z + zeta + 10) * args.zscale, 0, zm))
+                        if zv1 < zm:
+                            block = vfv[zv1:zv2, yv1:yv2, xv1:xv2]
+                            block_ds[zeta:np.clip(zeta + 10, 0, block_ds.shape[0]),...] = rescale(block,
+                                (1 / args.zscale, 1 / args.xyscale, 1 / args.xyscale), preserve_range=True)
+                    tiff.imwrite('/home/silvestri/Lavoro/Experiments/Pini/block'+str(n)+'.tiff',block_ds)
+                    try:
+                        alveomask = segment(block_ds, 180)
+                        vol, surf = morpho(alveomask)
+                        vols.append(vol)
+                        surfs.append(surf)
+                        out_mask[z:int(zmax / args.zscale),
+                                 y:int(yv2 / args.xyscale), x:int(xv2 / args.xyscale)] = alveomask.astype('uint8')
+                    except:
+                        logger.warning('error while processing block %d', n)
                 n += 1
 
     tiff.imwrite(args.outpath + '.tiff', out_mask)
-    np.savetxt(args.outpath + '.csv', alveoli, delimiter=',', fmt='%d')
+    np.savetxt(args.outpath + '_vol.csv', vols, delimiter=',', fmt='%d')
+    np.savetxt(args.outpath + '_surf.csv', surfs, delimiter=',', fmt='%d')
 
 
 def mask(image, threshold, scale):
@@ -103,6 +123,10 @@ def segment(image, threshold):
     # remove holes from binary data and extract pixel-wise skeleton
     ims = remove_small_holes(binary_opening(im, ball(3)), area_threshold=100000)
     sk = skeletonize_3d(ims)
+
+    # if the skeleton is empty, directly return a black array
+    if sk.max() == 0:
+        return sk.astype('int64')
 
     # extract vectorial skeleton and prune it
     skeleton1 = skan.Skeleton(sk)
@@ -130,6 +154,10 @@ def segment(image, threshold):
 
     # extract pruned skeleton
     skpruned = sk - pruning
+
+    if skpruned.max() == 0.0:
+        return skpruned.astype('int64')
+
     skeleton = skan.Skeleton(skpruned)
     branch_data = skan.summarize(skeleton)
     j2e = branch_data[branch_data['branch-type'] == 1]
@@ -156,18 +184,17 @@ def segment(image, threshold):
     ed = distance_transform_edt(ims)
     wt = watershed(-ed, markers=markers.astype('int64'), mask=ims, compactness=10)
 
-    # cleanup watershed, preserving only alveoli
+    # cleanup watershed, preserving only alveoli with reasonable size
     wtlab = np.copy(wt)
     wtlab[np.where(np.logical_and(wtlab < j2ef.shape[0], wtlab > 0))] = 1
     wtlab[np.where(wtlab >= j2ef.shape[0])] = 0
     labels = label(wtlab)
-    for n in range(labels.max()):
+    for n in range(labels.max() + 1):
         s = np.sum(wtlab[labels == n])
-        if s < 50000:
+        if s < 700:
             wtlab[labels == n] = 0
-        elif s > 1000000:
-            if np.max(wtlab[labels == n]) == 1:
-                wtlab[labels == n] = 0
+        elif s > 70000:
+            wtlab[labels == n] = 0
     return wtlab
 
 

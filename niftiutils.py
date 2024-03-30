@@ -256,7 +256,7 @@ def merge16(f_path, b_path, out_path, ms, t):
     logger.info('output image saved to %s', out_path)
 
 
-def tif2nii(in_path, out_path, x_pix=0.025, y_pix=0.025, z_pix=0.025):
+def tif2nii(in_path, out_path, x_pix=0.025, y_pix=0.025, z_pix=0.025, type='uint8'):
     import numpy as np
     import nibabel as nib
     import os
@@ -273,8 +273,13 @@ def tif2nii(in_path, out_path, x_pix=0.025, y_pix=0.025, z_pix=0.025):
     nifti.header['pixdim'][1] = x_pix
     nifti.header['pixdim'][2] = y_pix
     nifti.header['pixdim'][3] = z_pix
-    # 2 is the NIFTI code for unsigned char, see https://nifti.nimh.nih.gov/nifti-1/documentation/nifti1fields/
-    nifti.header['datatype'] = 2
+    if type == 'uint8':
+        # 2 is the NIFTI code for unsigned char, see https://nifti.nimh.nih.gov/nifti-1/documentation/nifti1fields/
+        nifti.header['datatype'] = 2
+    elif type == 'uint16':
+        # 512 is the NIFTI code for unsigned 16bit, see https://nifti.nimh.nih.gov/nifti-1/documentation/nifti1fields/
+        nifti.header['datatype'] = 512
+
     nifti.header['bitpix'] = 8
     # 2 is the NIFTI code for millimeters, see https://nifti.nimh.nih.gov/nifti-1/documentation/nifti1fields/
     nifti.header['xyzt_units'] = 2
