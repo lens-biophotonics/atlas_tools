@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 
-niftisize = 0.025  # voxel size (in mm) of nifti file
-
 
 def main():
     import logging
@@ -10,7 +8,6 @@ def main():
     import os
     import argparse
     from zetastitcher import VirtualFusedVolume
-    import nibabel as nib
 
     logger = logging.getLogger(__name__)
     logging.basicConfig(format='[%(funcName)s] - %(asctime)s - %(message)s', level=logging.INFO)

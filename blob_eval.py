@@ -9,8 +9,6 @@ def main():
     import argparse
     import numpy as np
     import os
-    import sys
-    sys.path.insert(0, '/mnt/NASone/ludo/devel/atlas_tools/')
     from blob_utils import blob_detector, compare_points
 
     logger = logging.getLogger(__name__)

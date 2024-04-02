@@ -3,7 +3,6 @@
 def main():
     import logging
     import coloredlogs
-    from zetastitcher import InputFile
     import numpy as np
     import argparse
     import nibabel as nib
