@@ -50,8 +50,8 @@ def main():
     xm = vfv.shape[2]
     ym = vfv.shape[1]
     zm = vfv.shape[0]
-    vols = []
-    surfs = []
+    vols = np.array(())
+    surfs = np.array(())
     scale_tup = tuple((args.zscale, args.xyscale, args.xyscale))
     out_shape = tuple(int(l / r) for l, r in zip(vfv.shape, scale_tup))
     out_mask = np.zeros(out_shape).astype('uint8')
@@ -87,8 +87,8 @@ def main():
                     try:
                         alveomask = segment(block_ds, 180)
                         vol, surf = morpho(alveomask)
-                        vols.append(vol)
-                        surfs.append(surf)
+                        vols = np.append(vols, vol)
+                        surfs = np.append(surfs, surf)
                         out_mask[z:int(zmax / args.zscale),
                                  y:int(yv2 / args.xyscale), x:int(xv2 / args.xyscale)] = alveomask.astype('uint8')
                     except:
@@ -203,8 +203,8 @@ def morpho(alveomask):
     from skimage.morphology import binary_dilation
     from skimage.measure import label
 
-    vol = []
-    surf = []
+    vol = np.array(())
+    surf = np.array(())
     labels = label(alveomask)
     for n in np.arange(labels.max()):
         temp = labels == n
@@ -213,8 +213,8 @@ def morpho(alveomask):
         temp2 = binary_dilation(temp)
         tempo2 = temp2.astype('float')
         v = tempo2.sum()
-        vol.append(u)
-        surf.append(v - u)
+        vol = np.append(vol, u)
+        surf = np.append(surf, v - u)
 
     return vol, surf
 
