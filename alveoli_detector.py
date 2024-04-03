@@ -86,7 +86,7 @@ def main():
                             block = vfv[zv1:zv2, yv1:yv2, xv1:xv2]
                             block_ds[zeta:np.clip(zeta + 10, 0, block_ds.shape[0]),...] = rescale(block,
                                 (1 / args.zscale, 1 / args.xyscale, 1 / args.xyscale), preserve_range=True)
-                    tiff.imwrite('/home/silvestri/Lavoro/Experiments/Pini/block'+str(n)+'.tiff',block_ds)
+                    #tiff.imwrite('/home/silvestri/Lavoro/Experiments/Pini/block'+str(n)+'.tiff',block_ds)
                     try:
                         alveomask = segment(block_ds, 180)
                         vol, surf = morpho(alveomask)
