@@ -9,7 +9,7 @@ def main():
     import argparse
     import tifffile as tiff
     from zetastitcher import VirtualFusedVolume
-    from skimage.transform import rescale
+    from skimage.transform import resize
     from os import getcwd
     from os.path import join
 
@@ -84,8 +84,9 @@ def main():
                         zv2 = int(np.clip((z + zeta + 10) * args.zscale, 0, zm))
                         if zv1 < zm:
                             block = vfv[zv1:zv2, yv1:yv2, xv1:xv2]
-                            block_ds[zeta:np.clip(zeta + 10, 0, block_ds.shape[0]),...] = rescale(block,
-                                (1 / args.zscale, 1 / args.xyscale, 1 / args.xyscale), preserve_range=True)
+                            block_ds[zeta:np.clip(zeta + 10, 0, block_ds.shape[0]),...] = resize(block,
+                                (np.min(10, block_ds.shape[0]-zeta), block_ds.shape[1],
+                                 block_ds.shape[2]), anti_aliasing=True, preserve_range=True)
                     #tiff.imwrite('/home/silvestri/Lavoro/Experiments/Pini/block'+str(n)+'.tiff',block_ds)
                     try:
                         alveomask = segment(block_ds, 180)
