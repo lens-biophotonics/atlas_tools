@@ -10,6 +10,8 @@ def main():
     import tifffile as tiff
     from zetastitcher import VirtualFusedVolume
     from skimage.transform import rescale
+    from os import getcwd
+    from os.path import join
 
     logger = logging.getLogger(__name__)
     vfv_logger = logging.getLogger("{0}.{1}")
@@ -27,6 +29,7 @@ def main():
     parser.add_argument('-z', '--zscale', help="z scaling from full-res to analysis-res", type=float,
                         default=2.5)
     parser.add_argument('-o', '--outpath', help="output base path", metavar='PATH')
+    parser.add_argument('-n', '--name', help="experiment name without spaces")
     args = parser.parse_args()
 
     logger.info('reading downscaled image...')
@@ -95,9 +98,18 @@ def main():
                         logger.warning('error while processing block %d', n)
                 n += 1
 
-    tiff.imwrite(args.outpath + '.tiff', out_mask)
-    np.savetxt(args.outpath + '_vol.csv', vols, delimiter=',', fmt='%d')
-    np.savetxt(args.outpath + '_surf.csv', surfs, delimiter=',', fmt='%d')
+    if args.outpath == '.':
+        filetif = join(getcwd(), args.name + '.tiff')
+        filev = join(getcwd(), args.name + '_vol.csv')
+        files = join(getcwd(), args.name + '_surf.csv')
+    else:
+        filetif = join(args.outpath, args.name + '.tiff')
+        filev = join(args.outpath, args.name + '_vol.csv')
+        files = join(args.outpath, args.name + '_surf.csv')
+
+    tiff.imwrite(str(filetif), out_mask)
+    np.savetxt(str(filev), vols, delimiter=',', fmt='%d')
+    np.savetxt(str(files), surfs, delimiter=',', fmt='%d')
 
 
 def mask(image, threshold, scale):
