@@ -30,7 +30,7 @@ def main():
     # temp = np.zeros((args.zscale*2, vfv.shape[1], vfv.shape[2])).astype('uint16')
 
     for z in np.arange(0, out_image.shape[0], 2):
-        temp = vfv[(z * args.zscale):((z + 2) * args.zscale), ...]
+        temp = vfv[int(z * args.zscale):int((z + 2) * args.zscale), ...]
         out_image[z:z+2, ...] = resize(temp, (2, out_shape[1], out_shape[2]))
 
     tiff.imwrite(args.output, out_image, compression='lzw')
