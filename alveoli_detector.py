@@ -84,19 +84,27 @@ def main():
                         zv2 = int(np.clip((z + zeta + 10) * args.zscale, 0, zm))
                         if zv1 < zm:
                             block = vfv[zv1:zv2, yv1:yv2, xv1:xv2]
-                            block_ds[zeta:np.clip(zeta + 10, 0, block_ds.shape[0]),...] = resize(block,
-                                (np.min(10, block_ds.shape[0]-zeta), block_ds.shape[1],
+                            clipped = np.clip(zeta + 10, 0, block_ds.shape[0])
+                            if clipped > zeta:
+                                block_ds[zeta:clipped,...] = resize(block,
+                                (np.minimum(10, block_ds.shape[0]-zeta), block_ds.shape[1],
                                  block_ds.shape[2]), anti_aliasing=True, preserve_range=True)
                     #tiff.imwrite('/home/silvestri/Lavoro/Experiments/Pini/block'+str(n)+'.tiff',block_ds)
+                    alveo = True
                     try:
                         alveomask = segment(block_ds, 180)
-                        vol, surf = morpho(alveomask)
-                        vols = np.append(vols, vol)
-                        surfs = np.append(surfs, surf)
-                        out_mask[z:int(zmax / args.zscale),
-                                 y:int(yv2 / args.xyscale), x:int(xv2 / args.xyscale)] = alveomask.astype('uint8')
                     except:
-                        logger.warning('error while processing block %d', n)
+                        logger.error('error while segmenting block %d', n)
+                        alveo = False
+                    if alveo:
+                        try:
+                            vol, surf = morpho(alveomask)
+                            vols = np.append(vols, vol)
+                            surfs = np.append(surfs, surf)
+                            out_mask[z:int(zmax / args.zscale),
+                                 y:int(yv2 / args.xyscale), x:int(xv2 / args.xyscale)] = alveomask.astype('uint8')
+                        except:
+                            logger.error('error while analyzing block %d', n)
                 n += 1
 
     if args.outpath == '.':
