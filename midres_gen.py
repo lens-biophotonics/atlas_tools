@@ -33,7 +33,7 @@ def main():
         temp = vfv[int(z * args.zscale):int((z + 2) * args.zscale), ...]
         out_image[z:z+2, ...] = resize(temp, (2, out_shape[1], out_shape[2]))
 
-    tiff.imwrite(args.output, out_image, compression='lzw')
+    tiff.imwrite(args.output, out_image)
 
 
 if __name__ == "__main__":
