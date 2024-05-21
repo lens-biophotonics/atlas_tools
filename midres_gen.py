@@ -32,7 +32,7 @@ def main():
     for z in np.arange(0, out_image.shape[0], 2):
         temp = vfv[int(z * args.zscale):int((z + 2) * args.zscale), ...]
         try:
-            out_image[z:z+2, ...] = resize(temp, (2, out_shape[1], out_shape[2]))
+            out_image[z:z+2, ...] = resize(temp, (2, out_shape[1], out_shape[2]), preserve_range=True)
         except:
             logger.warning("Error while processing last slice")
 
