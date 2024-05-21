@@ -29,12 +29,8 @@ def main():
     test = tiff.imread(os.path.join(args.input, lista[0]))
 
     a = np.zeros((args.batch, test.shape[1], test.shape[2]))
-    limit = int(len(lista) / args.batch)
+    limit = int(len(lista) / args.batch) * args.batch
     rem = len(lista) % args.batch
-    print(rem)
-    print(limit)
-    print(args.batch)
-    print(len(lista))
 
     aree = []
     coords = []
