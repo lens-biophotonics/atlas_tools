@@ -31,6 +31,10 @@ def main():
     a = np.zeros((args.batch, test.shape[1], test.shape[2]))
     limit = int(len(lista) / args.batch)
     rem = len(lista) % args.batch
+    print(rem)
+    print(limit)
+    print(args.batch)
+    print(len(lista))
 
     aree = []
     coords = []
@@ -48,7 +52,7 @@ def main():
             centro[0] += n
             coords.append(tuple(centro))
 
-    a1 = np.zeros(rem, test.shape[1], test.shape[2])
+    a1 = np.zeros((rem, test.shape[1], test.shape[2]))
 
     logger.info('processing last batch')
     for m in np.arange(0, rem):
