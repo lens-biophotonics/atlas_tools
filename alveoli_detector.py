@@ -9,6 +9,9 @@ def main():
     import argparse
     import tifffile as tiff
     from zetastitcher import VirtualFusedVolume
+    from scipy.spatial.qhull import QhullError
+    from scipy import spatial
+    spatial.QhullError = QhullError
     from skimage.transform import resize
     from os import getcwd
     from os.path import join
@@ -122,6 +125,9 @@ def main():
 
 
 def mask(image, threshold, scale):
+    from scipy.spatial.qhull import QhullError
+    from scipy import spatial
+    spatial.QhullError = QhullError
     from skimage.transform import rescale
     from skimage.morphology import binary_opening, binary_closing, ball
     im2 = rescale(image, 1 / scale, preserve_range=True)
@@ -132,6 +138,9 @@ def mask(image, threshold, scale):
 
 
 def segment(image, threshold):
+    from scipy.spatial.qhull import QhullError
+    from scipy import spatial
+    spatial.QhullError = QhullError
     from skimage.morphology import binary_opening, ball, skeletonize_3d, remove_small_holes
     import numpy as np
     import skan
@@ -221,6 +230,9 @@ def segment(image, threshold):
 
 def morpho(alveomask):
     import numpy as np
+    from scipy.spatial.qhull import QhullError
+    from scipy import spatial
+    spatial.QhullError = QhullError
     from skimage.morphology import binary_dilation
     from skimage.measure import label
 
