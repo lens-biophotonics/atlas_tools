@@ -28,8 +28,8 @@ def main():
     back = back[['x', 'y', 'z']]
 
     logger.info('fusing point clouds...')
-    front_2 = front[front['z'] >= args.t]
-    back_2 = back[back['z'] < args.t]
+    front_2 = front[front['z'] <= args.t]
+    back_2 = back[back['z'] > args.t]
     wb = pd.concat([front_2, back_2])
     wb.to_csv(args.output, index=False)
     logger.info('point cloud saved to %s', args.output)
