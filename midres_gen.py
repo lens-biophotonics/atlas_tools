@@ -21,6 +21,8 @@ def main():
                         default=8)
     parser.add_argument('-z', '--zscale', help="z scaling from full-res to analysis-res", type=float,
                         default=2.5)
+    parser.add_argument('-s0', help="minimum slice", type=int, default=0)
+    parser.add_argument('-s1', help="maximum slice", type=int, default=1000000000)
     args = parser.parse_args()
 
     vfv = VirtualFusedVolume(args.input)
@@ -29,7 +31,7 @@ def main():
     out_image = np.zeros(out_shape).astype('uint16')
     # temp = np.zeros((args.zscale*2, vfv.shape[1], vfv.shape[2])).astype('uint16')
 
-    for z in np.arange(0, out_image.shape[0], 2):
+    for z in np.arange(np.maximum(0, args.s0), np.minimum(out_image.shape[0], args.s1), 2):
         temp = vfv[int(z * args.zscale):int((z + 2) * args.zscale), ...]
         try:
             out_image[z:z+2, ...] = resize(temp, (2, out_shape[1], out_shape[2]), preserve_range=True)
