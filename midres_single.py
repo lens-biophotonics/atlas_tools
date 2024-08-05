@@ -40,5 +40,6 @@ def main():
     logger.info('writing output image')
     tiff.imwrite(args.output, mid2.astype(p.dtype))
 
+
 if __name__ == "__main__":
     main()
