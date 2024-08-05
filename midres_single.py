@@ -27,13 +27,14 @@ def main():
     logger.info('opening input TIFF file...')
     img = tiff.TiffFile(args.input)
     p = img.pages[0]
-    shape = (len(img.pages), int(p.shape[1] / args.xyscale), int(p.shape[0] / args.xyscale))
+    shape = ((args.s1 - args.s0), int(p.shape[1] / args.xyscale), int(p.shape[0] / args.xyscale))
     mid = np.zeros(shape).astype(p.dtype)
 
+    n = 0
     for i in range(args.s0, args.s1):
         p = img.pages[i]
-        mid[i] = resize(p.asarray(), (mid.shape[1], mid.shape[2]), preserve_range=True)
-        i += 1
+        mid[n] = resize(p.asarray(), (mid.shape[1], mid.shape[2]), preserve_range=True)
+        n += 1
 
     mid2 = resize(mid, (int(mid.shape[0] / args.zscale), mid.shape[1], mid.shape[2]), preserve_range=True)
 
