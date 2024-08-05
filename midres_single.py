@@ -30,7 +30,7 @@ def main():
     shape = (len(img.pages), int(p.shape[1] / args.xyscale), int(p.shape[0] / args.xyscale))
     mid = np.zeros(shape).astype(p.dtype)
 
-    for i in range(len(img.pages)):
+    for i in range(args.s0, args.s1):
         p = img.pages[i]
         mid[i] = resize(p.asarray(), (mid.shape[1], mid.shape[2]), preserve_range=True)
         i += 1
