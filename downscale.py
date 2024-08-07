@@ -29,7 +29,7 @@ def main():
     n_files = int(vfv.shape[0]/args.zscale)
     for i in np.arange(n_files):
         temp = vfv[(i*args.zscale):((i+1)*args.zscale), ...]
-        image = rescale(temp, scale_tup)
+        image = rescale(temp, scale_tup, preserve_range=True)
         filename = args.output + "_%03d.tiff" % i
         tiff.imwrite(filename, image)
 
