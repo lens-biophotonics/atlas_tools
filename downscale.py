@@ -31,7 +31,7 @@ def main():
         temp = vfv[(i*args.zscale):((i+1)*args.zscale), ...]
         image = rescale(temp, scale_tup, preserve_range=True)
         filename = args.output + "_%03d.tiff" % i
-        tiff.imwrite(filename, image)
+        tiff.imwrite(filename, image.astype('uint16'))
 
 
 if __name__ == "__main__":
