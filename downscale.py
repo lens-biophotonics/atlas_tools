@@ -24,7 +24,10 @@ def main():
     args = parser.parse_args()
 
     vfv = VirtualFusedVolume(args.input)
-    scale_tup = tuple((1/args.zscale, 1/args.xyscale, 1/args.xyscale))
+    if args.zscale > 1:
+        scale_tup = tuple((1/args.zscale, 1/args.xyscale, 1/args.xyscale))
+    else:
+        scale_tup = tuple((1/args.xyscale, 1/args.xyscale))
 
     n_files = int(vfv.shape[0]/args.zscale)
     for i in np.arange(n_files):
