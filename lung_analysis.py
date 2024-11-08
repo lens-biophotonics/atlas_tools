@@ -14,7 +14,7 @@ def main():
 
     logger = logging.getLogger(__name__)
     logging.basicConfig(format='[%(funcName)s] - %(asctime)s - %(message)s', level=logging.INFO)
-    coloredlogs.install(level='DEBUG', logger=logger)
+    coloredlogs.install(level='INFO', logger=logger)
 
     parser = argparse.ArgumentParser()
     parser.add_argument('-i', '--input', help="input file base", metavar='PATH')
@@ -58,7 +58,7 @@ def main():
     print('Alveolar density is ' + str(len(volvec)/norm) + ' mm^-3')
 
     logger.info('saving report to file')
-    with open(args.output + '_report.txt', 'w') as f:
+    with open(args.input + '_report.txt', 'w') as f:
         f.write('Alveolar volume is ' + str(volvec.mean()) + '+/-' + str(volvec.std()) + ' um^3 (mean +/- std)')
         f.write('Alveolar surface is ' + str(survec.mean()) + '+/-' + str(survec.std()) + ' um^2 (mean +/- std)')
         f.write('Alveolar surface/volume ratio is ' + str(s2v.mean()) + '+/-' + str(s2v.std())
