@@ -83,7 +83,7 @@ def alveoli_finder(sorted_regions, shape):
 
     logger = logging.getLogger(__name__)
     logging.basicConfig(format='[%(funcName)s] - %(asctime)s - %(message)s', level=logging.INFO)
-    coloredlogs.install(level='DEBUG', logger=logger)
+    coloredlogs.install(level='INFO', logger=logger)
 
     alveolim = np.zeros(shape).astype('uint8')
     volumes = []  # list to append all volumes
