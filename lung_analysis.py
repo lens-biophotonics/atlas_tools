@@ -49,6 +49,7 @@ def main():
     np.savetxt(args.input + '_volumes.csv', volvec, delimiter=',')
     np.savetxt(args.input + '_surfaces.csv', survec, delimiter=',')
     np.savetxt(args.input + '_surface_2_volume.csv', s2v, delimiter=',')
+    tiff.imwrite(args.input + '_alveoli_image.tiff', alveoli_image.astype('uint8'))
     print('Alveolar volume is ' + str(volvec.mean()) + '+/-' + str(volvec.std()) + ' um^3 (mean +/- std)')
     print('Alveolar surface is ' + str(survec.mean()) + '+/-' + str(survec.std()) + ' um^2 (mean +/- std)')
     print('Alveolar surface/volume ratio is ' + str(s2v.mean()) + '+/-' + str(s2v.std())
