@@ -57,7 +57,7 @@ def main():
     print('Alveolar volume ratio is ' + str(np.sum(volvec)/(1000000000 * norm)))
     print('Alveolar surface density is ' + str(np.sum(survec)/(1000000 * norm)) + ' mm^-1')
     print('Alveolar density is ' + str(len(volvec)/norm) + ' mm^-3')
-    print(str(len(volvec)) + 'alveoli detected in the volume')
+    print(str(len(volvec)) + ' alveoli detected in the volume')
 
     logger.info('saving report to file')
     with open(args.input + '_report.txt', 'w') as f:
