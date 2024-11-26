@@ -68,7 +68,7 @@ def main():
         f.write('Alveolar volume ratio is ' + str(np.sum(volvec) / (1000000000 * norm)))
         f.write('Alveolar surface density is ' + str(np.sum(survec) / (1000000 * norm)) + ' mm^-1')
         f.write('Alveolar density is ' + str(len(volvec) / norm) + ' mm^-3')
-        f.write(str(len(volvec)) + 'alveoli detected in the volume')
+        f.write(str(len(volvec)) + ' alveoli detected in the volume')
 
     logger.info('done')
 
