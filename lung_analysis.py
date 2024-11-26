@@ -57,6 +57,7 @@ def main():
     print('Alveolar volume ratio is ' + str(np.sum(volvec)/(1000000000 * norm)))
     print('Alveolar surface density is ' + str(np.sum(survec)/(1000000 * norm)) + ' mm^-1')
     print('Alveolar density is ' + str(len(volvec)/norm) + ' mm^-3')
+    print(str(len(volvec)) + 'alveoli detected in the volume')
 
     logger.info('saving report to file')
     with open(args.input + '_report.txt', 'w') as f:
@@ -67,6 +68,7 @@ def main():
         f.write('Alveolar volume ratio is ' + str(np.sum(volvec) / (1000000000 * norm)))
         f.write('Alveolar surface density is ' + str(np.sum(survec) / (1000000 * norm)) + ' mm^-1')
         f.write('Alveolar density is ' + str(len(volvec) / norm) + ' mm^-3')
+        f.write(str(len(volvec)) + 'alveoli detected in the volume')
 
     logger.info('done')
 
@@ -145,9 +147,13 @@ def alveoli_finder(sorted_regions, shape):
                     comp = label(water)
                     alveoli = regionprops(comp)
                     for alveolo in alveoli:
-                        volumes.append(alveolo.area)
-                        v, f, n, va = marching_cubes(alveolo.image)
-                        surfaces.append(mesh_surface_area(v, f))
+                        try:
+                            v, f, n, va = marching_cubes(alveolo.image)
+                            temp = mesh_surface_area(v, f)
+                            volumes.append(alveolo.area)
+                            surfaces.append(temp)
+                        except:
+                            ghi = 1
                 except:
                     if region.area < 1500:
                         alveolim[zmin:zmax, ymin:ymax, xmin:xmax] += (reg > 0).astype('uint8') * 255
